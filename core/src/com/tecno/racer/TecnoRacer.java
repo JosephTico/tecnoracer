@@ -1,20 +1,15 @@
 package com.tecno.racer;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import scenes.MainMenu;
+import helpers.ScreenEnum;
+import helpers.ScreenManager;
 
 public class TecnoRacer extends Game {
-	private SpriteBatch batch;
-
-	public SpriteBatch getBatch() {
-		return batch;
-	}
 
 	@Override
 	public void create () {
-		batch = new SpriteBatch();
-		setScreen(new MainMenu(this));
+		ScreenManager.getInstance().initialize(this);
+		ScreenManager.getInstance().showScreen( ScreenEnum.MAIN_MENU );
 
 	}
 
