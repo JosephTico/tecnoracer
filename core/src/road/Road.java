@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class Road {
 	private GameState state;
-	private ArrayList<RoadSegment> roadSegments = new ArrayList<>();
+	private ArrayList<RoadSegment> roadSegments = new ArrayList<RoadSegment>();
 	private PolygonSpriteBatch polygonSpriteBatch = new PolygonSpriteBatch();
 
 	private static final Texture BACKGROUND_HILLS = new Texture("background/hills.png");
@@ -25,9 +25,9 @@ public class Road {
 		roadSegments.clear();
 
 		for (int i = 0; i < 500; i++) {
-			var p1 = new Point();
+			Point p1 = new Point();
 			p1.world.z = i * GameParameters.SEGMENT_LENGTH;
-			var p2 = new Point();
+			Point p2 = new Point();
 			p2.world.z = (i+1) * GameParameters.SEGMENT_LENGTH;
 
 			if (Math.floor(i / GameParameters.RUMBLE_LENGTH) % 2 == 1) {

@@ -17,10 +17,10 @@ public class Player extends Actor {
 
 	private float speed = 0;
 	float playerX = 0;
-	boolean keyRight = false;
-	boolean keyLeft = false;
-	boolean keyFaster = false;
-	boolean keySlower = false;
+	public boolean keyRight = false;
+	public boolean keyLeft = false;
+	public boolean keyFaster = false;
+	public boolean keySlower = false;
 
 	Sprite sprite = new Sprite(new Texture(Gdx.files.internal("badlogic.jpg")));
 
@@ -28,45 +28,6 @@ public class Player extends Actor {
 
 		setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
 		setTouchable(Touchable.enabled);
-
-		addListener(new InputListener() {
-			@Override
-			public boolean keyDown(InputEvent event, int keycode) {
-				switch (keycode) {
-					case Input.Keys.RIGHT:
-						Player.this.keyRight = true;
-						break;
-					case Input.Keys.LEFT:
-						Player.this.keyLeft = true;
-						break;
-					case Input.Keys.DOWN:
-						Player.this.keySlower = true;
-						break;
-					case Input.Keys.UP:
-						Player.this.keyFaster = true;
-						break;
-				}
-				return true;
-			};
-
-			public boolean keyUp(InputEvent event, int keycode) {
-				switch (keycode) {
-					case Input.Keys.RIGHT:
-						Player.this.keyRight = false;
-						break;
-					case Input.Keys.LEFT:
-						Player.this.keyLeft = false;
-						break;
-					case Input.Keys.DOWN:
-						Player.this.keySlower = false;
-						break;
-					case Input.Keys.UP:
-						Player.this.keyFaster = false;
-						break;
-				}
-				return true;
-			}
-		});
 	}
 
 	private float accelerate(float v, float accel, float dt) {
@@ -74,7 +35,7 @@ public class Player extends Actor {
 	}
 
 	private float increase(float start, float increment, int max) {
-		var result = start + increment;
+		float result = start + increment;
 		while (result >= max)
 			result -= max;
 		while (result < 0)
@@ -87,15 +48,15 @@ public class Player extends Actor {
 
 		float dx = delta * 2 * (this.speed / GameParameters.MAX_SPEED);
 
-		if (this.keyLeft) {
+		if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || (Gdx.input.isTouched() && Gdx.input.getX() < GameParameters.WIDTH / 2)) {
 			this.playerX = this.playerX - dx;
-		} else if (this.keyRight) {
+		} else if (this.keyRight  || (Gdx.input.isTouched() && Gdx.input.getX() >= GameParameters.WIDTH / 2)) {
 			this.playerX = this.playerX + dx;
 		}
 
-		if (this.keyFaster) {
+		if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isTouched()) {
 			this.speed = accelerate(this.speed, GameParameters.ACCEL, delta);
-		} else if (this.keySlower) {
+		} else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
 			this.speed = accelerate(this.speed, GameParameters.BREAKING, delta);
 		} else {
 			this.speed = accelerate(this.speed, GameParameters.DECEL, delta);
@@ -110,8 +71,6 @@ public class Player extends Actor {
 
 		this.setPosition(playerX, 0);
 
-		System.out.format("X %f\n", this.playerX);
-		System.out.format("Velocidad %f\n", this.speed);
 
 
 	}

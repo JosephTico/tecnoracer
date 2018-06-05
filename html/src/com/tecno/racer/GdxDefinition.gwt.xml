@@ -6,9 +6,13 @@
 	<inherits name='com.badlogic.gdx.ai' />
 	<inherits name='com.badlogic.gdx.controllers.controllers-gwt' />
 
-	<inherits name='com.google.gwt.user.User' />
 
 	<inherits name='TecnoRacer' />
+	<inherits name="screens" />
+	<inherits name="player" />
+	<inherits name="road" />
+	<inherits name="helpers" />
+
 	<entry-point class='com.tecno.racer.client.HtmlLauncher' />
 	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
 	<set-configuration-property name="gdx.assetpath" value="../core/assets" />

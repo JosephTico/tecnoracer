@@ -1,0 +1,15 @@
+:html:addSource
+:core:compileJava UP-TO-DATE
+:core:processResources NO-SOURCE
+:core:classes UP-TO-DATE
+:core:jar UP-TO-DATE
+:html:compileJava UP-TO-DATE
+:html:processResources NO-SOURCE
+:html:draftCompileGwt
+Compiling module com.tecno.racer.GdxDefinitionSuperdev
+   [ERROR] Hint: Check that your module inherits 'com.google.gwt.core.Core' either directly or indirectly (most often by inheriting module 'com.google.gwt.user.User')
+:html:draftCompileGwt FAILED
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 5.0.
+See https://docs.gradle.org/4.6/userguide/command_line_interface.html#sec:command_line_warnings
+5 actionable tasks: 2 executed, 3 up-to-date

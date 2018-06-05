@@ -1,10 +1,14 @@
 package screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
-import helpers.AbstractScreen;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.tecno.racer.GameParameters;
 import com.tecno.racer.GameState;
+import helpers.AbstractScreen;
+import player.Player;
 
 public class GameStage extends AbstractScreen {
 
@@ -20,7 +24,6 @@ public class GameStage extends AbstractScreen {
 		state.road.resetRoad();
 		state.music = Gdx.audio.newMusic(Gdx.files.internal("music/racer.mp3"));
 		addActor(state.player);
-		setKeyboardFocus(state.player);
 		state.music.play();
 	}
 
