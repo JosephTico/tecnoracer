@@ -1,22 +1,21 @@
 package player;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
 import helpers.GameInfo;
 import helpers.GameState;
 
 public class Player extends Actor {
 
-	float speed = 0;
+	private float speed = 0;
 	float playerX = 0;
 	boolean keyRight = false;
 	boolean keyLeft = false;
@@ -74,7 +73,7 @@ public class Player extends Actor {
 		return v + (accel * dt);
 	}
 
-	private float increase(float start, float increment, float max) {
+	private float increase(float start, float increment, int max) {
 		var result = start + increment;
 		while (result >= max)
 			result -= max;
@@ -83,14 +82,10 @@ public class Player extends Actor {
 		return result;
 	};
 
-	private float limit(float value, float min, float max) {
-		return Math.max(min, Math.min(value, max));
-	}
-
 	public void update(float delta, GameState state) {
-		state.position = increase(state.position, delta * speed, state.trackLength);
+		state.position = Math.round(increase(state.position, delta * speed, state.trackLength));
 
-		float dx = delta * 2 * (this.speed / GameInfo.maxSpeed);
+		float dx = delta * 2 * (this.speed / GameInfo.MAX_SPEED);
 
 		if (this.keyLeft) {
 			this.playerX = this.playerX - dx;
@@ -99,24 +94,31 @@ public class Player extends Actor {
 		}
 
 		if (this.keyFaster) {
-			this.speed = accelerate(this.speed, GameInfo.accel, delta);
+			this.speed = accelerate(this.speed, GameInfo.ACCEL, delta);
 		} else if (this.keySlower) {
-			this.speed = accelerate(this.speed, GameInfo.breaking, delta);
+			this.speed = accelerate(this.speed, GameInfo.BREAKING, delta);
 		} else {
-			this.speed = accelerate(this.speed, GameInfo.decel, delta);
+			this.speed = accelerate(this.speed, GameInfo.DECEL, delta);
 		}
 
-		if (((this.playerX < -1) || (this.playerX > 1)) && (this.speed > GameInfo.offRoadLimit)) {
-			this.speed = accelerate(this.speed, GameInfo.offRoadDecel, delta);
+		if (((this.playerX < -1) || (this.playerX > 1)) && (this.speed > GameInfo.OFF_ROAD_LIMIT)) {
+			this.speed = accelerate(this.speed, GameInfo.OFF_ROAD_DECEL, delta);
 		}
 
-		this.playerX = limit(this.playerX, -2, 2);     // dont ever let player go too far out of bounds
-		this.speed   = limit(this.speed, 0, GameInfo.maxSpeed); // or exceed maxSpeed*/
+		playerX = MathUtils.clamp(playerX, -2, 2);
+		speed = MathUtils.clamp(speed, 0, GameInfo.MAX_SPEED);
+
+		this.setPosition(playerX, 0);
 
 		System.out.format("X %f\n", this.playerX);
 		System.out.format("Velocidad %f\n", this.speed);
 
 
+	}
+
+
+	public float getSpeed() {
+		return speed;
 	}
 
 	@Override
