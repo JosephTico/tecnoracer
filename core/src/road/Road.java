@@ -3,8 +3,8 @@ package road;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import helpers.GameInfo;
-import helpers.GameState;
+import com.tecno.racer.GameParameters;
+import com.tecno.racer.GameState;
 
 import java.util.ArrayList;
 
@@ -26,57 +26,57 @@ public class Road {
 
 		for (int i = 0; i < 500; i++) {
 			var p1 = new Point();
-			p1.world.z = i * GameInfo.SEGMENT_LENGTH;
+			p1.world.z = i * GameParameters.SEGMENT_LENGTH;
 			var p2 = new Point();
-			p2.world.z = (i+1) * GameInfo.SEGMENT_LENGTH;
+			p2.world.z = (i+1) * GameParameters.SEGMENT_LENGTH;
 
-			if (Math.floor(i / GameInfo.RUMBLE_LENGTH) % 2 == 1) {
+			if (Math.floor(i / GameParameters.RUMBLE_LENGTH) % 2 == 1) {
 				this.roadSegments.add(RoadSegment.createDarkRoadSegment(i, p1, p2));
 			} else {
 				this.roadSegments.add(RoadSegment.createLightRoadSegment(i, p1, p2));
 			}
 		}
 
-		this.state.trackLength = this.roadSegments.size() * GameInfo.SEGMENT_LENGTH;
+		this.state.trackLength = this.roadSegments.size() * GameParameters.SEGMENT_LENGTH;
 	}
 
 	public RoadSegment findSegment(int z) {
-		return this.roadSegments.get((int) Math.floor(z / GameInfo.SEGMENT_LENGTH) % roadSegments.size());
+		return this.roadSegments.get((int) Math.floor(z / GameParameters.SEGMENT_LENGTH) % roadSegments.size());
 	}
 
 	public void render(Camera camera) {
 		polygonSpriteBatch.setProjectionMatrix(camera.combined);
 		polygonSpriteBatch.begin();
 
-		polygonSpriteBatch.draw(BACKGROUND_SKY, 0, 0, BACKGROUND_SKY.getWidth(), GameInfo.HEIGHT);
-		polygonSpriteBatch.draw(BACKGROUND_HILLS, 0, 0, BACKGROUND_HILLS.getWidth(), GameInfo.HEIGHT);
-		polygonSpriteBatch.draw(BACKGROUND_TREES, 0, 0, BACKGROUND_TREES.getWidth(), GameInfo.HEIGHT);
+		polygonSpriteBatch.draw(BACKGROUND_SKY, 0, 0, BACKGROUND_SKY.getWidth(), GameParameters.HEIGHT);
+		polygonSpriteBatch.draw(BACKGROUND_HILLS, 0, 0, BACKGROUND_HILLS.getWidth(), GameParameters.HEIGHT);
+		polygonSpriteBatch.draw(BACKGROUND_TREES, 0, 0, BACKGROUND_TREES.getWidth(), GameParameters.HEIGHT);
 
-		RoadSegment playerSegment = findSegment(Math.round(state.position + GameInfo.PLAYER_Z));
+		RoadSegment playerSegment = findSegment(Math.round(state.position + GameParameters.PLAYER_Z));
 		RoadSegment baseSegment = findSegment(state.position);
 
-		float playerPercent = percentRemaining(state.position + GameInfo.PLAYER_Z, GameInfo.SEGMENT_LENGTH);
+		float playerPercent = percentRemaining(state.position + GameParameters.PLAYER_Z, GameParameters.SEGMENT_LENGTH);
 		float playerY = interpolate(playerSegment.getP1().world.y, playerSegment.getP2().world.y, playerPercent);
 
 		float maxY = 0;
 		float x = 0;
-		float basePercent = (state.position % GameInfo.SEGMENT_LENGTH) / (float) GameInfo.SEGMENT_LENGTH;
+		float basePercent = (state.position % GameParameters.SEGMENT_LENGTH) / (float) GameParameters.SEGMENT_LENGTH;
 		float dx = -(0 * 0); // TODO: CURVAS FUTURO
 
 
-		for (int n = 0; n < Math.min(GameInfo.DRAW_DISTANCE, roadSegments.size()); n++) {
+		for (int n = 0; n < Math.min(GameParameters.DRAW_DISTANCE, roadSegments.size()); n++) {
 
 			RoadSegment segment = roadSegments.get((baseSegment.getIndex() + n) % roadSegments.size());
 			segment.setClip(maxY);
 			boolean segmentLooped = segment.getIndex() < baseSegment.getIndex();
-			project(segment.getP1(), state.player.getX() * GameInfo.ROAD_WIDTH - x, playerY + GameInfo.CAMERA_HEIGHT, state.position - (segmentLooped ? state.trackLength : 0), GameInfo.CAMERA_DEPTH, GameInfo.WIDTH, GameInfo.HEIGHT, GameInfo.ROAD_WIDTH);
-			project(segment.getP2(), state.player.getX() * GameInfo.ROAD_WIDTH - x - dx, playerY + GameInfo.CAMERA_HEIGHT, state.position - (segmentLooped ? state.trackLength : 0), GameInfo.CAMERA_DEPTH, GameInfo.WIDTH, GameInfo.HEIGHT, GameInfo.ROAD_WIDTH);
+			project(segment.getP1(), state.player.getX() * GameParameters.ROAD_WIDTH - x, playerY + GameParameters.CAMERA_HEIGHT, state.position - (segmentLooped ? state.trackLength : 0), GameParameters.CAMERA_DEPTH, GameParameters.WIDTH, GameParameters.HEIGHT, GameParameters.ROAD_WIDTH);
+			project(segment.getP2(), state.player.getX() * GameParameters.ROAD_WIDTH - x - dx, playerY + GameParameters.CAMERA_HEIGHT, state.position - (segmentLooped ? state.trackLength : 0), GameParameters.CAMERA_DEPTH, GameParameters.WIDTH, GameParameters.HEIGHT, GameParameters.ROAD_WIDTH);
 
 			x = x + dx;
 			dx = dx + 0; //TODO: Curva en 0
 
 			if (
-					segment.getP1().camera.z <= GameInfo.CAMERA_DEPTH // Behind us
+					segment.getP1().camera.z <= GameParameters.CAMERA_DEPTH // Behind us
 							|| (segment.getP2().screen.y <= segment.getP1().screen.y)  // back face cull
 							|| (segment.getP2().screen.y < maxY)) { // clip by (already rendered) segment
 				continue;
@@ -85,10 +85,10 @@ public class Road {
 			maxY = segment.getP1().screen.y;
 		}
 
-		for (int n = (Math.min(GameInfo.DRAW_DISTANCE, roadSegments.size()) - 1); n > 0; n--) {
+		for (int n = (Math.min(GameParameters.DRAW_DISTANCE, roadSegments.size()) - 1); n > 0; n--) {
 			RoadSegment segment = roadSegments.get((baseSegment.getIndex() + n) % roadSegments.size());
 			if (segment == playerSegment) {
-				//renderPlayer(speed / maxSpeed, CAMERA_DEPTH / PLAYER_Z, WIDTH / 2);
+				//renderPlayer(speed / maxSpeed, CAMERA_DEPTH / PLAYER_Z, GameParameters.WIDTH / 2);
 			}
 		}
 

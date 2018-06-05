@@ -3,9 +3,8 @@ package screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import helpers.AbstractScreen;
-import helpers.GameInfo;
-import helpers.GameState;
-import player.Player;
+import com.tecno.racer.GameParameters;
+import com.tecno.racer.GameState;
 
 public class GameStage extends AbstractScreen {
 
@@ -33,7 +32,7 @@ public class GameStage extends AbstractScreen {
 		state.player.update(delta, state);
 		state.road.render(getCamera());
 		super.act(delta);
-		state.music.setVolume(state.player.getSpeed() / (GameInfo.MAX_SPEED * 3f));
+		state.music.setVolume(state.player.getSpeed() / (GameParameters.MAX_SPEED * 3f));
 		super.draw();
 	}
 

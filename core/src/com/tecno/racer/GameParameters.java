@@ -1,8 +1,8 @@
-package helpers;
+package com.tecno.racer;
 
-public final class GameInfo {
+public final class GameParameters {
 
-	private GameInfo() {
+	private GameParameters() {
 		// non-public constructor
 	}
 
@@ -24,7 +24,7 @@ public final class GameInfo {
 	public static final float CAMERA_DEPTH = (float) (1 / Math.tan((FIELD_OF_VIEW / 2) * Math.PI / 180));                    // z distance camera is from screen (computed)
 	public static final int DRAW_DISTANCE = 300;                     // number of segments to draw
 	public static final int playerX       = 0;                       // player x offset from center of road (-1 to 1 to stay independent of ROAD_WIDTH)
-	public static final float PLAYER_Z = CAMERA_HEIGHT * GameInfo.CAMERA_DEPTH; // player relative z distance from camera (computed)
+	public static final float PLAYER_Z = CAMERA_HEIGHT * GameParameters.CAMERA_DEPTH; // player relative z distance from camera (computed)
 	public static final int fogDensity    = 5;                       // exponential fog density
 	public static final int position      = 0;                       // current camera Z position (add playerZ to get player's absolute Z position)
 	public static final int speed         = 0;                       // current speed

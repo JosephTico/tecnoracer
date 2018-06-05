@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import helpers.GameInfo;
+import com.tecno.racer.GameParameters;
 
-import static helpers.GameInfo.LANES;
+import static com.tecno.racer.GameParameters.LANES;
 
 public class RoadSegment {
 	private static final TextureRegion DARK_ROAD = new TextureRegion(new Texture("background/dark_road.jpg"));
@@ -89,7 +89,7 @@ public class RoadSegment {
 		float l1 = laneMarkerWidth(w1, LANES);
 		float l2 = laneMarkerWidth(w2, LANES);
 
-		polygonSpriteBatch.draw(grassTexture, 0, screen2.y, GameInfo.WIDTH, screen1.y - screen2.y);
+		polygonSpriteBatch.draw(grassTexture, 0, screen2.y, GameParameters.ROAD_WIDTH, screen1.y - screen2.y);
 
 		polygon(polygonSpriteBatch, x1 - w1 - r1, y1, x1 - w1, y1, x2 - w2, y2, x2 - w2 - r2, y2, rumbleTexture);
 		polygon(polygonSpriteBatch, x1 + w1 + r1, y1, x1 + w1, y1, x2 + w2, y2, x2 + w2 + r2, y2, rumbleTexture);

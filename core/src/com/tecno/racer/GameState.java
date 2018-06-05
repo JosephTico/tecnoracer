@@ -1,4 +1,4 @@
-package helpers;
+package com.tecno.racer;
 
 import com.badlogic.gdx.audio.Music;
 import player.Player;

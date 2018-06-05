@@ -10,8 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import helpers.GameInfo;
-import helpers.GameState;
+import com.tecno.racer.GameParameters;
+import com.tecno.racer.GameState;
 
 public class Player extends Actor {
 
@@ -85,7 +85,7 @@ public class Player extends Actor {
 	public void update(float delta, GameState state) {
 		state.position = Math.round(increase(state.position, delta * speed, state.trackLength));
 
-		float dx = delta * 2 * (this.speed / GameInfo.MAX_SPEED);
+		float dx = delta * 2 * (this.speed / GameParameters.MAX_SPEED);
 
 		if (this.keyLeft) {
 			this.playerX = this.playerX - dx;
@@ -94,19 +94,19 @@ public class Player extends Actor {
 		}
 
 		if (this.keyFaster) {
-			this.speed = accelerate(this.speed, GameInfo.ACCEL, delta);
+			this.speed = accelerate(this.speed, GameParameters.ACCEL, delta);
 		} else if (this.keySlower) {
-			this.speed = accelerate(this.speed, GameInfo.BREAKING, delta);
+			this.speed = accelerate(this.speed, GameParameters.BREAKING, delta);
 		} else {
-			this.speed = accelerate(this.speed, GameInfo.DECEL, delta);
+			this.speed = accelerate(this.speed, GameParameters.DECEL, delta);
 		}
 
-		if (((this.playerX < -1) || (this.playerX > 1)) && (this.speed > GameInfo.OFF_ROAD_LIMIT)) {
-			this.speed = accelerate(this.speed, GameInfo.OFF_ROAD_DECEL, delta);
+		if (((this.playerX < -1) || (this.playerX > 1)) && (this.speed > GameParameters.OFF_ROAD_LIMIT)) {
+			this.speed = accelerate(this.speed, GameParameters.OFF_ROAD_DECEL, delta);
 		}
 
 		playerX = MathUtils.clamp(playerX, -2, 2);
-		speed = MathUtils.clamp(speed, 0, GameInfo.MAX_SPEED);
+		speed = MathUtils.clamp(speed, 0, GameParameters.MAX_SPEED);
 
 		this.setPosition(playerX, 0);
 

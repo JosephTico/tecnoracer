@@ -6,11 +6,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.tecno.racer.GameParameters;
 
 public abstract class AbstractScreen extends Stage implements Screen {
 
 	protected AbstractScreen() {
-		super(new StretchViewport((float) GameInfo.WIDTH, (float) GameInfo.HEIGHT, new OrthographicCamera()));
+		super(new StretchViewport((float) GameParameters.WIDTH, (float) GameParameters.HEIGHT, new OrthographicCamera()));
 	}
 
 	// Subclasses must load actors in this method
