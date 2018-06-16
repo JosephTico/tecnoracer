@@ -33,6 +33,7 @@ public class GameStage extends AbstractScreen {
 		Gdx.gl.glClearColor(0, 1, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		state.player.update(delta, state);
+		state.road.update(delta);
 		state.road.render(getCamera());
 		super.act(delta);
 		state.music.setVolume(state.player.getSpeed() / (GameParameters.MAX_SPEED * 3f));

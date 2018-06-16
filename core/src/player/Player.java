@@ -4,14 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.tecno.racer.GameParameters;
 import com.tecno.racer.GameState;
+import road.RoadSegment;
 
 public class Player extends Actor {
 
@@ -22,7 +22,13 @@ public class Player extends Actor {
 	public boolean keyFaster = false;
 	public boolean keySlower = false;
 
-	Sprite sprite = new Sprite(new Texture(Gdx.files.internal("badlogic.jpg")));
+	private static final Texture SPRITE_RIGHT = new Texture("sprites/player_right.png");
+	private static final Texture SPRITE_LEFT = new Texture("sprites/player_left.png");
+	private static final Texture SPRITE_STRAIGHT = new Texture("sprites/player_straight.png");
+
+	private Texture currentTexture = SPRITE_RIGHT;
+
+	private Sprite sprite = new Sprite(currentTexture);
 
 	public Player() {
 
@@ -46,24 +52,41 @@ public class Player extends Actor {
 	public void update(float delta, GameState state) {
 		state.position = Math.round(increase(state.position, delta * speed, state.trackLength));
 
-		float dx = delta * 2 * (this.speed / GameParameters.MAX_SPEED);
+		float speedPercent = speed / GameParameters.MAX_SPEED;
+		float dx = delta * speedPercent * 2; // at top speed, should be able to cross from left to right (-1 to 1) in 1 second
+
 
 		if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || (Gdx.input.isTouched() && Gdx.input.getX() < GameParameters.WIDTH / 2)) {
-			this.playerX = this.playerX - dx;
-		} else if (this.keyRight  || (Gdx.input.isTouched() && Gdx.input.getX() >= GameParameters.WIDTH / 2)) {
-			this.playerX = this.playerX + dx;
+			playerX = playerX - dx;
+			if (speed > 0) {
+				sprite.setTexture(SPRITE_LEFT);
+			}
+		} else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)  || (Gdx.input.isTouched() && Gdx.input.getX() >= GameParameters.WIDTH / 2)) {
+			playerX = playerX + dx;
+			if (speed > 0) {
+				sprite.setTexture(SPRITE_RIGHT);
+			}
+		} else {
+			sprite.setTexture(SPRITE_STRAIGHT);
 		}
+
+		RoadSegment playerSegment = state.road.findSegment(Math.round(state.position + GameParameters.PLAYER_Z));
+
+		playerX = playerX - (dx * speedPercent * playerSegment.getCurve() * GameParameters.CENTRIFUGAL);
+
+
+
 
 		if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isTouched()) {
-			this.speed = accelerate(this.speed, GameParameters.ACCEL, delta);
+			speed = accelerate(speed, GameParameters.ACCEL, delta);
 		} else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-			this.speed = accelerate(this.speed, GameParameters.BREAKING, delta);
+			speed = accelerate(speed, GameParameters.BREAKING, delta);
 		} else {
-			this.speed = accelerate(this.speed, GameParameters.DECEL, delta);
+			speed = accelerate(speed, GameParameters.DECEL, delta);
 		}
 
-		if (((this.playerX < -1) || (this.playerX > 1)) && (this.speed > GameParameters.OFF_ROAD_LIMIT)) {
-			this.speed = accelerate(this.speed, GameParameters.OFF_ROAD_DECEL, delta);
+		if (((playerX < -1) || (playerX > 1)) && (speed > GameParameters.OFF_ROAD_LIMIT)) {
+			speed = accelerate(speed, GameParameters.OFF_ROAD_DECEL, delta);
 		}
 
 		playerX = MathUtils.clamp(playerX, -2, 2);
@@ -80,6 +103,10 @@ public class Player extends Actor {
 		return speed;
 	}
 
+	public void setSpeed(float speed) {
+		this.speed = speed;
+	}
+
 	@Override
 	protected void positionChanged() {
 		sprite.setPosition(getX(), getY());
@@ -88,7 +115,37 @@ public class Player extends Actor {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		sprite.draw(batch);
+
+
+
+
+	}
+
+
+	public float getWidth() {
+		return SPRITE_STRAIGHT.getWidth();
+	}
+	public float getHeight() {
+		return SPRITE_STRAIGHT.getHeight();
+	}
+	public void draw(Batch batch, float x, float y, float width, float height) {
+		draw(batch, x, y, width, height, 1);
+	}
+
+	public void draw(Batch batch, float x, float y, float width, float height, float percentageToDraw) {
+		batch.draw(sprite.getTexture(), x, y, width, height);
+	}
+
+	public void render(PolygonSpriteBatch polygonSpriteBatch, float speedPercent, float scale, float destX) {
+
+		float bounce = (float) (1.5 * Math.random() * speedPercent) * MathUtils.random(-1, 1);
+
+		float destW = (getWidth() * scale) * GameParameters.ROAD_SCALE_FACTOR;
+		float destH = (getHeight() * scale) * GameParameters.ROAD_SCALE_FACTOR;
+
+		destX = destX + (destW * -0.5F);
+
+		draw(polygonSpriteBatch, destX, bounce, destW, destH);
 	}
 
 	@Override

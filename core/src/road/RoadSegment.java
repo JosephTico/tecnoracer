@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.tecno.racer.GameParameters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.tecno.racer.GameParameters.LANES;
 
 public class RoadSegment {
@@ -24,23 +27,28 @@ public class RoadSegment {
 	private final boolean hasLines;
 	private final TextureRegion grassTexture;
 	private final TextureRegion rumbleTexture;
+	private final float curve;
+
+	private List<Car> cars = new ArrayList<>();
+	//private List<Scenery> sceneries = new ArrayList<>();
 
 
 
 	private float clip;
 
-	public static RoadSegment createLightRoadSegment(int index, Point p1, Point p2) {
-		return new RoadSegment(index, p1, p2, LIGHT_ROAD, LIGHT_GRASS, WHITE_RUMBLE, true);
+	public static RoadSegment createLightRoadSegment(int index, Point p1, Point p2, float curve) {
+		return new RoadSegment(index, p1, p2, curve, LIGHT_ROAD, LIGHT_GRASS, WHITE_RUMBLE, true);
 	}
 
-	public static RoadSegment createDarkRoadSegment(int index, Point p1, Point p2) {
-		return new RoadSegment(index, p1, p2, DARK_ROAD, DARK_GRASS, RED_RUMBLE, false);
+	public static RoadSegment createDarkRoadSegment(int index, Point p1, Point p2, float curve) {
+		return new RoadSegment(index, p1, p2, curve, DARK_ROAD, DARK_GRASS, RED_RUMBLE, false);
 	}
 
 
-	public RoadSegment(int index, Point p1, Point p2, TextureRegion roadTexture, TextureRegion grassTexture, TextureRegion rumbleTexture, boolean hasLines) {
+	public RoadSegment(int index, Point p1, Point p2, float curve, TextureRegion roadTexture, TextureRegion grassTexture, TextureRegion rumbleTexture, boolean hasLines) {
 		this.p1 = p1;
 		this.p2 = p2;
+		this.curve = curve;
 		this.index = index;
 		this.roadTexture = roadTexture;
 		this.grassTexture = grassTexture;
@@ -66,6 +74,10 @@ public class RoadSegment {
 
 	public float getClip() {
 		return clip;
+	}
+
+	public float getCurve() {
+		return curve;
 	}
 
 	public void draw(PolygonSpriteBatch polygonSpriteBatch) {
@@ -144,6 +156,14 @@ public class RoadSegment {
 
 	private float laneMarkerWidth(float projectedRoadWidth, float lanes) {
 		return projectedRoadWidth / Math.max(32, 8 * lanes);
+	}
+
+	public void addCar(Car car) {
+		this.cars.add(car);
+	}
+
+	public List<Car> getCars() {
+		return cars;
 	}
 
 }

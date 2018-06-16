@@ -35,5 +35,7 @@ public final class GameParameters {
 	public static final float OFF_ROAD_DECEL = -MAX_SPEED /2.0f;             // off road deceleration is somewhere in between
 	public static final float OFF_ROAD_LIMIT =  MAX_SPEED /4.0f;             // limit when off road deceleration no longer applies (e.g. you can always go at least this speed even when off road)
 
-
+	public static final float SPRITE_SCALE = 0.3F * (1 / 320F); //320 is the players car width
+	public static final float ROAD_SCALE_FACTOR = 3 * WIDTH / 2 * (SPRITE_SCALE * ROAD_WIDTH);
+	public static final float CENTRIFUGAL = 0.3F;
 }
