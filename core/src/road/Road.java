@@ -19,6 +19,7 @@ public class Road {
 	private List<RoadSegment> roadSegments = new ArrayList<RoadSegment>();
 	private PolygonSpriteBatch polygonSpriteBatch = new PolygonSpriteBatch();
 	private List<Car> cars = new ArrayList<>();
+	private List<Bomb> bombs = new ArrayList<>();
 
 	private static final Texture BACKGROUND_HILLS = ScreenManager.getInstance().assetManager.get("background/hills.png", Texture.class);
 	private static final Texture BACKGROUND_SKY = ScreenManager.getInstance().assetManager.get("background/sky.png", Texture.class);
@@ -26,12 +27,16 @@ public class Road {
 
 	public Road(GameState state) {
 		this.state = state;
+		BACKGROUND_HILLS.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+		BACKGROUND_SKY.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+		BACKGROUND_TREES.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 	}
 
 	public void resetRoad() {
 		roadSegments.clear();
 
 		RoadBuilder roadBuilder = new RoadBuilder()
+				.addStraight(RoadBuilder.Length.LONG)
 				.addRightCurve(RoadBuilder.Length.SHORT, RoadBuilder.Curve.TIGHT, RoadBuilder.Hills.NONE)
 				.addLeftCurve(RoadBuilder.Length.SHORT, RoadBuilder.Curve.TIGHT, RoadBuilder.Hills.HIGH)
 				.addRightCurve(RoadBuilder.Length.MEDIUM, RoadBuilder.Curve.LIGHT, RoadBuilder.Hills.HIGH)
@@ -44,7 +49,8 @@ public class Road {
 				.addDip(RoadBuilder.Length.SHORT, RoadBuilder.Hills.HIGH)
 				.addStraight(RoadBuilder.Length.MEDIUM)
 				.addRightCurve(RoadBuilder.Length.LONG, RoadBuilder.Curve.LIGHT, RoadBuilder.Hills.NONE)
-				.addLeftCurve(RoadBuilder.Length.LONG, RoadBuilder.Curve.TIGHT, RoadBuilder.Hills.NONE);
+				.addLeftCurve(RoadBuilder.Length.LONG, RoadBuilder.Curve.TIGHT, RoadBuilder.Hills.NONE)
+				.addStraight(RoadBuilder.Length.LONG);
 
 		roadSegments = roadBuilder.build();
 
@@ -52,6 +58,7 @@ public class Road {
 
 		resetCars();
 		resetScenery();
+		resetBombs();
 	}
 
 	private void resetScenery() {
@@ -83,14 +90,20 @@ public class Road {
 			cars.add(car);
 		}
 
-		Hole hole;
+	}
+
+	private void resetBombs() {
+		Bomb bomb;
+		RoadSegment segment;
+		float offset;
+		int z;
 		for (int n = 0; n < 50; n++) {
 			offset = (float) (Math.random() * MathUtils.random(-1F, 1F));
 			z = (int) (Math.floor(Math.random() * roadSegments.size()) * GameParameters.SEGMENT_LENGTH);
-			hole = new Hole(offset, z);
-			segment = findSegment(hole.getZ());
-			segment.addCar(hole);
-			cars.add(hole);
+			bomb = new Bomb(offset, z);
+			segment = findSegment(bomb.getZ());
+			segment.addBomb(bomb);
+			bombs.add(bomb);
 		}
 	}
 
@@ -187,6 +200,12 @@ public class Road {
 
 		float playerW = state.player.getWidth() * GameParameters.SPRITE_SCALE;
 
+		float speedPercent = state.player.getSpeed() / GameParameters.MAX_SPEED;
+
+		state.skyOffset  = increase(state.skyOffset,  GameParameters.SKY_SPEED  * playerSegment.getCurve() * speedPercent, 1);
+		state.hillOffset = increase(state.hillOffset, GameParameters.HILL_SPEED * playerSegment.getCurve() * speedPercent, 1);
+		state.treeOffset = increase(state.treeOffset, GameParameters.TREE_SPEED * playerSegment.getCurve() * speedPercent, 1);
+
 		updateCars(delta, playerSegment, playerW);
 
 		if (((playerX < -1) || (playerX > 1)) && (state.player.getSpeed() > GameParameters.OFF_ROAD_LIMIT)) {
@@ -213,6 +232,42 @@ public class Road {
 				}
 			}
 		}
+
+		// Update bombs
+		for (int n = 0; n < playerSegment.getBombs().size(); n++) {
+			Bomb bomb = playerSegment.getBombs().get(n);
+			float bombW = bomb.getWidth() * SPRITE_SCALE * 6;
+			if (state.player.getSpeed() > 0 && bomb.isActive()) {
+				if (overlap(playerX, playerW, bomb.getOffset(), bombW, 0.8F)) {
+					state.player.setSpeed(0);
+					state.position = Math.round(increase(bomb.getZ(), -GameParameters.PLAYER_Z, state.trackLength));
+					bomb.setActive(false);
+					bomb.texture =  ScreenManager.getInstance().assetManager.get("sprites/explosion.gif", Texture.class);;
+					break;
+				}
+			}
+		}
+	}
+
+	public void renderBackground(Texture texture, float rotation, float offset) {
+		float imageW = texture.getWidth()/2;
+		float imageH = texture.getHeight();
+
+		int sourceX = Math.round(texture.getWidth() * rotation);
+		int sourceY = texture.getHeight();
+		int sourceW = Math.round(Math.min(imageW, texture.getWidth()-sourceX));
+		int sourceH = Math.round(imageH);
+
+		float destX = 0;
+		float destY = Math.round(offset);
+		float destW = Math.round(GameParameters.WIDTH * (sourceW/imageW));
+		float destH = GameParameters.HEIGHT;
+
+
+		polygonSpriteBatch.draw(texture,destX,destY, 0, 0, destW, destH, 1f, 1f, 0f, sourceX, sourceY, sourceW, sourceH, false, false);
+		if (sourceW < imageW) {
+			polygonSpriteBatch.draw(texture,destW - 1,destY, 0, 0, GameParameters.WIDTH - destW, destH, 1f, 1f, 0f, 0, sourceY, Math.round(imageW - sourceW), sourceH, false, false);
+		}
 	}
 
 
@@ -220,15 +275,18 @@ public class Road {
 		polygonSpriteBatch.setProjectionMatrix(camera.combined);
 		polygonSpriteBatch.begin();
 
-		polygonSpriteBatch.draw(BACKGROUND_SKY, 0, 0, BACKGROUND_SKY.getWidth(), GameParameters.HEIGHT);
-		polygonSpriteBatch.draw(BACKGROUND_HILLS, 0, 0, BACKGROUND_HILLS.getWidth(), GameParameters.HEIGHT);
-		polygonSpriteBatch.draw(BACKGROUND_TREES, 0, 0, BACKGROUND_TREES.getWidth(), GameParameters.HEIGHT);
+
+
 
 		RoadSegment playerSegment = findSegment(Math.round(state.position + GameParameters.PLAYER_Z));
 		RoadSegment baseSegment = findSegment(state.position);
 
 		float playerPercent = percentRemaining(state.position + GameParameters.PLAYER_Z, GameParameters.SEGMENT_LENGTH);
 		float playerY = interpolate(playerSegment.getP1().world.y, playerSegment.getP2().world.y, playerPercent);
+
+		renderBackground(BACKGROUND_SKY, state.skyOffset, GameParameters.HEIGHT / 480 * GameParameters.SKY_SPEED * playerY);
+		renderBackground(BACKGROUND_HILLS, state.hillOffset, GameParameters.HEIGHT / 480 * GameParameters.HILL_SPEED * playerY);
+		renderBackground(BACKGROUND_TREES, state.treeOffset, GameParameters.HEIGHT / 480 * GameParameters.TREE_SPEED * playerY);
 
 		float maxY = 0;
 		float x = 0;
@@ -261,6 +319,7 @@ public class Road {
 		for (int n = (Math.min(DRAW_DISTANCE, roadSegments.size()) - 1); n > 0; n--) {
 			RoadSegment segment = roadSegments.get((baseSegment.getIndex() + n) % roadSegments.size());
 
+			// render scenary
 			for (int i = 0; i < segment.getScenery().size(); i++) {
 				Scenery scenery = segment.getScenery().get(i);
 				float spriteScale = segment.getP1().screen.scale;
@@ -277,6 +336,16 @@ public class Road {
 				float spriteX = interpolate(segment.getP1().screen.x, segment.getP2().screen.x, carPercent) + (spriteScale * car.getOffset() * GameParameters.ROAD_WIDTH * GameParameters.WIDTH / 2);
 				float spriteY = interpolate(segment.getP1().screen.y, segment.getP2().screen.y, carPercent);
 				car.render(polygonSpriteBatch, spriteScale, spriteX, spriteY, segment.getClip());
+			}
+
+			// render bombs
+			for (int i = 0; i < segment.getBombs().size(); i++) {
+				Bomb bomb = segment.getBombs().get(i);
+				float carPercent = percentRemaining(bomb.getZ(), GameParameters.SEGMENT_LENGTH);
+				float spriteScale = interpolate(segment.getP1().screen.scale, segment.getP2().screen.scale, carPercent);
+				float spriteX = interpolate(segment.getP1().screen.x, segment.getP2().screen.x, carPercent) + (spriteScale * bomb.getOffset() * GameParameters.ROAD_WIDTH * GameParameters.WIDTH / 2);
+				float spriteY = interpolate(segment.getP1().screen.y, segment.getP2().screen.y, carPercent);
+				bomb.render(polygonSpriteBatch, spriteScale, spriteX, spriteY, segment.getClip());
 			}
 
 

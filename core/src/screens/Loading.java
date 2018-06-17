@@ -90,7 +90,8 @@ public class Loading extends AbstractScreen {
 		assMan.load("background/trees.png", Texture.class);
 		assMan.load("background/white_lines.jpg", Texture.class);
 		assMan.load("background/white_rumble.jpg", Texture.class);
-		assMan.load("sprites/bomb.gif", Texture.class);
+		assMan.load("sprites/bomb.png", Texture.class);
+		assMan.load("sprites/explosion.gif", Texture.class);
 
 
 	}

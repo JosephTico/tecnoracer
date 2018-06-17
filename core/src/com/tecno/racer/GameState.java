@@ -11,6 +11,10 @@ public class GameState {
 	public int position = 0;
 	public int trackLength = 500;
 
+	public float skyOffset = 0;
+	public float hillOffset = 0;
+	public float treeOffset = 0;
+
 	public AssetManager manager = new AssetManager();
 
 	public Music music;

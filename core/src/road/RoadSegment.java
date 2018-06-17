@@ -32,6 +32,7 @@ public class RoadSegment {
 
 	private List<Car> cars = new ArrayList<>();
 	private List<Scenery> sceneries = new ArrayList<>();
+	private List<Bomb> bombs = new ArrayList<>();
 
 
 
@@ -175,4 +176,11 @@ public class RoadSegment {
 		return cars;
 	}
 
+	public List<Bomb> getBombs() {
+		return bombs;
+	}
+
+	public void addBomb(Bomb bomb) {
+		this.bombs.add(bomb);
+	}
 }

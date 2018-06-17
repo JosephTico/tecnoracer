@@ -21,6 +21,7 @@ public class GameStage extends AbstractScreen {
 	protected Skin skin;
 	Table table;
 	Label label;
+	Label debugLabel;
 
 	public GameStage() {
 		super();
@@ -47,6 +48,18 @@ public class GameStage extends AbstractScreen {
 		label = new Label("Speed", skin);
 		table.add(label).expandX().center();
 
+		Table table2;
+		table2 = new Table(skin);
+		table2.setBackground("window-c");
+		table2.setHeight(150f);
+		table2.setWidth(200f);
+		table2.setX(GameParameters.WIDTH - table2.getWidth() - 10);
+		table2.setY(GameParameters.HEIGHT - table2.getHeight() - 10);
+		addActor(table2);
+
+		debugLabel = new Label("Speed", skin);
+		table2.add(debugLabel).expandX().center();
+
 	}
 
 
@@ -62,6 +75,7 @@ public class GameStage extends AbstractScreen {
 		super.draw();
 		getBatch().begin();
 		label.setText("Speed: " + Math.round(state.player.getSpeed() / GameParameters.MAX_SPEED  * 180) + "kph");
+		debugLabel.setText("X: " + state.player.getX() +  "\nPos: " + state.position +  "\nLength: " + state.trackLength + "\nSegment: " + Math.round(state.position / GameParameters.SEGMENT_LENGTH) + " of " + Math.round(state.trackLength / GameParameters.SEGMENT_LENGTH));
 		getBatch().end();
 	}
 

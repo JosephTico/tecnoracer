@@ -34,4 +34,8 @@ public final class GameParameters {
 	public static final float SPRITE_SCALE = 0.3F * (1 / 320F); //320 is the players car width
 	public static final float ROAD_SCALE_FACTOR = 3 * WIDTH / 2 * (SPRITE_SCALE * ROAD_WIDTH);
 	public static final float CENTRIFUGAL = 0.3F;
+
+	public static final float SKY_SPEED = 0.001f; // background sky layer scroll speed when going around curve (or up hill)
+	public static final float HILL_SPEED = 0.002f; // background hill layer scroll speed when going around curve (or up hill)
+	public static final float TREE_SPEED = 0.003f; // background tree layer scroll speed when going around curve (or up hill)
 }
