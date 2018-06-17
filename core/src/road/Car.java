@@ -29,6 +29,12 @@ public class Car {
 		texture = ScreenManager.getInstance().assetManager.get("sprites/car" + intToString(randNum, 2) + ".png");
 	}
 
+	public static String intToString(int num, int digits) {
+		String output = Integer.toString(num);
+		while (output.length() < digits) output = "0" + output;
+		return output;
+	}
+
 	public void dispose() {
 		texture.dispose();
 		speed = 0;
@@ -52,12 +58,6 @@ public class Car {
 
 	public int getWidth() {
 		return texture.getWidth();
-	}
-
-	public static String intToString(int num, int digits) {
-		String output = Integer.toString(num);
-		while (output.length() < digits) output = "0" + output;
-		return output;
 	}
 
 	public void updateCar(int z, float offset) {

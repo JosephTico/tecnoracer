@@ -6,6 +6,10 @@ import player.Player;
 import road.Road;
 
 public class GameState {
+	public int score;
+
+	public int lives = 3;
+
 	public GameState() {}
 
 	public int position = 0;

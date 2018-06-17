@@ -30,22 +30,13 @@ public class RoadSegment {
 	private final TextureRegion rumbleTexture;
 	private final float curve;
 
-	private List<Car> cars = new ArrayList<>();
-	private List<Scenery> sceneries = new ArrayList<>();
-	private List<Bomb> bombs = new ArrayList<>();
-
+	private List<Car> cars = new ArrayList<Car>();
+	private List<Scenery> sceneries = new ArrayList<Scenery>();
+	private List<Bomb> bombs = new ArrayList<Bomb>();
+	private List<Item> items = new ArrayList<Item>();
 
 
 	private float clip;
-
-	public static RoadSegment createLightRoadSegment(int index, Point p1, Point p2, float curve) {
-		return new RoadSegment(index, p1, p2, curve, LIGHT_ROAD, LIGHT_GRASS, WHITE_RUMBLE, true);
-	}
-
-	public static RoadSegment createDarkRoadSegment(int index, Point p1, Point p2, float curve) {
-		return new RoadSegment(index, p1, p2, curve, DARK_ROAD, DARK_GRASS, RED_RUMBLE, false);
-	}
-
 
 	public RoadSegment(int index, Point p1, Point p2, float curve, TextureRegion roadTexture, TextureRegion grassTexture, TextureRegion rumbleTexture, boolean hasLines) {
 		this.p1 = p1;
@@ -56,6 +47,14 @@ public class RoadSegment {
 		this.grassTexture = grassTexture;
 		this.rumbleTexture = rumbleTexture;
 		this.hasLines = hasLines;
+	}
+
+	public static RoadSegment createLightRoadSegment(int index, Point p1, Point p2, float curve) {
+		return new RoadSegment(index, p1, p2, curve, LIGHT_ROAD, LIGHT_GRASS, WHITE_RUMBLE, true);
+	}
+
+	public static RoadSegment createDarkRoadSegment(int index, Point p1, Point p2, float curve) {
+		return new RoadSegment(index, p1, p2, curve, DARK_ROAD, DARK_GRASS, RED_RUMBLE, false);
 	}
 
 	public Point getP1() {
@@ -70,12 +69,12 @@ public class RoadSegment {
 		return index;
 	}
 
-	public void setClip(float clip) {
-		this.clip = clip;
-	}
-
 	public float getClip() {
 		return clip;
+	}
+
+	public void setClip(float clip) {
+		this.clip = clip;
 	}
 
 	public float getCurve() {
@@ -182,5 +181,13 @@ public class RoadSegment {
 
 	public void addBomb(Bomb bomb) {
 		this.bombs.add(bomb);
+	}
+
+	public void addItem(Item item) {
+		this.items.add(item);
+	}
+
+	public List<Item> getItems() {
+		return items;
 	}
 }

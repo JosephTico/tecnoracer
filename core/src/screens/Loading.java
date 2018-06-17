@@ -16,10 +16,10 @@ import helpers.ScreenManager;
 
 public class Loading extends AbstractScreen {
 
-	private TextureAtlas atlas;
 	protected Skin skin;
 	Label loadingLabel;
 	boolean error = false;
+	private TextureAtlas atlas;
 
 	@Override
 	public void buildStage() {
@@ -39,8 +39,8 @@ public class Loading extends AbstractScreen {
 		root.setBackground(skin.getTiledDrawable("tile-a"));
 		addActor(root);
 
-		Image image = new Image(skin, "label-title");
-		root.add(image);
+		Image image = new Image(new Texture("sprites/logo.jpg"));
+		root.add(image).width(419).height(300).padBottom(20f);
 
 		root.row();
 		Table content = new Table();
@@ -90,8 +90,11 @@ public class Loading extends AbstractScreen {
 		assMan.load("background/trees.png", Texture.class);
 		assMan.load("background/white_lines.jpg", Texture.class);
 		assMan.load("background/white_rumble.jpg", Texture.class);
+
 		assMan.load("sprites/bomb.png", Texture.class);
 		assMan.load("sprites/explosion.gif", Texture.class);
+		assMan.load("sprites/bush1.png", Texture.class);
+		assMan.load("sprites/bush2.png", Texture.class);
 
 
 	}

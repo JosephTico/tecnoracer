@@ -12,7 +12,7 @@ import java.util.List;
 public class RoadBuilder {
 
 
-	private final List<RoadSegment> roadSegments = new ArrayList<>();
+	private final List<RoadSegment> roadSegments = new ArrayList<RoadSegment>();
 
 	public enum Length {
 

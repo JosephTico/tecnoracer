@@ -18,8 +18,9 @@ public class Road {
 	private GameState state;
 	private List<RoadSegment> roadSegments = new ArrayList<RoadSegment>();
 	private PolygonSpriteBatch polygonSpriteBatch = new PolygonSpriteBatch();
-	private List<Car> cars = new ArrayList<>();
-	private List<Bomb> bombs = new ArrayList<>();
+	private List<Car> cars = new ArrayList<Car>();
+	private List<Bomb> bombs = new ArrayList<Bomb>();
+	private List<Item> items = new ArrayList<Item>();
 
 	private static final Texture BACKGROUND_HILLS = ScreenManager.getInstance().assetManager.get("background/hills.png", Texture.class);
 	private static final Texture BACKGROUND_SKY = ScreenManager.getInstance().assetManager.get("background/sky.png", Texture.class);
@@ -59,6 +60,7 @@ public class Road {
 		resetCars();
 		resetScenery();
 		resetBombs();
+		resetItems();
 	}
 
 	private void resetScenery() {
@@ -104,6 +106,21 @@ public class Road {
 			segment = findSegment(bomb.getZ());
 			segment.addBomb(bomb);
 			bombs.add(bomb);
+		}
+	}
+
+	private void resetItems() {
+		Item item;
+		RoadSegment segment;
+		float offset;
+		int z;
+		for (int n = 0; n < 10; n++) {
+			offset = (float) (Math.random() * MathUtils.random(-1F, 1F));
+			z = (int) (Math.floor(Math.random() * roadSegments.size()) * GameParameters.SEGMENT_LENGTH);
+			item = new Item(offset, z, Item.Types.BOOST);
+			segment = findSegment(item.getZ());
+			segment.addItem(item);
+			items.add(item);
 		}
 	}
 
@@ -242,7 +259,27 @@ public class Road {
 					state.player.setSpeed(0);
 					state.position = Math.round(increase(bomb.getZ(), -GameParameters.PLAYER_Z, state.trackLength));
 					bomb.setActive(false);
-					bomb.texture =  ScreenManager.getInstance().assetManager.get("sprites/explosion.gif", Texture.class);;
+					bomb.texture =  ScreenManager.getInstance().assetManager.get("sprites/explosion.gif", Texture.class);
+					state.lives--;
+					break;
+				}
+			}
+		}
+
+		// Update Items
+		for (int n = 0; n < playerSegment.getItems().size(); n++) {
+			Item item = playerSegment.getItems().get(n);
+			float itemW = item.getWidth() * SPRITE_SCALE * 6;
+			if (state.player.getSpeed() > 0 && item.isActive()) {
+				if (overlap(playerX, playerW, item.getOffset(), itemW, 0.8F)) {
+					item.setActive(false);
+					if (item.type == Item.Types.LIFE) {
+						state.score += 300;
+						state.lives++;
+					} else if (item.type == Item.Types.BOOST) {
+						state.score += 200;
+						state.player.setSpeed(GameParameters.MAX_SPEED * 1.125f);
+					}
 					break;
 				}
 			}
@@ -328,9 +365,15 @@ public class Road {
 				scenery.render(polygonSpriteBatch, spriteScale, spriteX, spriteY, segment.getClip());
 			}
 
+
+			List<Car> carDerivatives = new ArrayList<Car>();
+			carDerivatives.addAll(segment.getCars());
+			carDerivatives.addAll(segment.getBombs());
+			carDerivatives.addAll(segment.getItems());
+
 			// render other cars
-			for (int i = 0; i < segment.getCars().size(); i++) {
-				Car car = segment.getCars().get(i);
+			for (int i = 0; i < carDerivatives.size(); i++) {
+				Car car = carDerivatives.get(i);
 				float carPercent = percentRemaining(car.getZ(), GameParameters.SEGMENT_LENGTH);
 				float spriteScale = interpolate(segment.getP1().screen.scale, segment.getP2().screen.scale, carPercent);
 				float spriteX = interpolate(segment.getP1().screen.x, segment.getP2().screen.x, carPercent) + (spriteScale * car.getOffset() * GameParameters.ROAD_WIDTH * GameParameters.WIDTH / 2);
@@ -338,15 +381,6 @@ public class Road {
 				car.render(polygonSpriteBatch, spriteScale, spriteX, spriteY, segment.getClip());
 			}
 
-			// render bombs
-			for (int i = 0; i < segment.getBombs().size(); i++) {
-				Bomb bomb = segment.getBombs().get(i);
-				float carPercent = percentRemaining(bomb.getZ(), GameParameters.SEGMENT_LENGTH);
-				float spriteScale = interpolate(segment.getP1().screen.scale, segment.getP2().screen.scale, carPercent);
-				float spriteX = interpolate(segment.getP1().screen.x, segment.getP2().screen.x, carPercent) + (spriteScale * bomb.getOffset() * GameParameters.ROAD_WIDTH * GameParameters.WIDTH / 2);
-				float spriteY = interpolate(segment.getP1().screen.y, segment.getP2().screen.y, carPercent);
-				bomb.render(polygonSpriteBatch, spriteScale, spriteX, spriteY, segment.getClip());
-			}
 
 
 			if (segment == playerSegment) {

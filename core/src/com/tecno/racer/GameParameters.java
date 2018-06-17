@@ -25,7 +25,7 @@ public final class GameParameters {
 	public static final float PLAYER_Z = CAMERA_HEIGHT * GameParameters.CAMERA_DEPTH; // player relative z distance from camera (computed)
 	public static final int fogDensity    = 5;                       // exponential fog density
 	public static final float MAX_SPEED = SEGMENT_LENGTH /step;      // top speed (ensure we can't move more than 1 segment in a single frame to make collision detection easier)
-	public static final float ACCEL =  MAX_SPEED /5.0f;             // acceleration rate - tuned until it 'felt' right
+	public static final float ACCEL =  MAX_SPEED /8.0f;             // acceleration rate - tuned until it 'felt' right
 	public static final float BREAKING = -MAX_SPEED;               // deceleration rate when braking
 	public static final float DECEL = -MAX_SPEED /5.0f;             // 'natural' deceleration rate when neither accelerating, nor braking
 	public static final float OFF_ROAD_DECEL = -MAX_SPEED /2.0f;             // off road deceleration is somewhere in between
