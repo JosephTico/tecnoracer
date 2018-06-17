@@ -1,6 +1,7 @@
 package helpers;
 
 import screens.GameStage;
+import screens.Loading;
 import screens.MainMenu;
 
 public enum ScreenEnum {
@@ -14,6 +15,9 @@ public enum ScreenEnum {
 		public AbstractScreen getScreen(Object... params) {
 			return new GameStage();
 		}
+	},
+	LOADING {
+		public AbstractScreen getScreen(Object... params) {return new Loading(); }
 	};
 
 	public abstract AbstractScreen getScreen(Object... params);

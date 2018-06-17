@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.tecno.racer.GameParameters;
 import com.tecno.racer.GameState;
+import helpers.ScreenEnum;
+import helpers.ScreenManager;
 import road.RoadSegment;
 
 public class Player extends Actor {
@@ -75,7 +77,9 @@ public class Player extends Actor {
 		playerX = playerX - (dx * speedPercent * playerSegment.getCurve() * GameParameters.CENTRIFUGAL);
 
 
-
+		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+			ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
+		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isTouched()) {
 			speed = accelerate(speed, GameParameters.ACCEL, delta);

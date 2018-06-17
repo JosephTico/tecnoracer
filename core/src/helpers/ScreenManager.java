@@ -2,18 +2,24 @@ package helpers;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 
 public class ScreenManager {
 
 	// Singleton: unique instance
 	private static ScreenManager instance;
 
+	// Reference to AssetManager
+	public AssetManager assetManager;
+
 	// Reference to game
 	private Game game;
 
 	// Singleton: private constructor
-	private ScreenManager() {
+	private ScreenManager()
+	{
 		super();
+		assetManager = new AssetManager();
 	}
 
 	// Singleton: retrieve instance

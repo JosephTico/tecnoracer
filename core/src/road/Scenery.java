@@ -10,28 +10,25 @@ import helpers.ScreenManager;
 import java.util.Random;
 
 /**
- * Created by Cookie on 03/05/2014.
+ * Created by Cookie on 04/05/2014.
  */
-public class Car {
-
+public class Scenery {
+	//    private static final Texture texture = new Texture("assets/billboard01.png");
 	protected Texture texture;
 
 	protected float offset;
 	protected int z;
-	protected float speed;
 
-	public Car(float offset, int z, float speed) {
+	public Scenery(float offset, int z) {
 		this.offset = offset;
 		this.z = z;
-		this.speed = speed;
 		Random rand = new Random();
-		int randNum = rand.nextInt(3) + 1;
-		texture = ScreenManager.getInstance().assetManager.get("sprites/car" + intToString(randNum, 2) + ".png");
+		int randNum = rand.nextInt(8) + 1;
+		texture = ScreenManager.getInstance().assetManager.get("sprites/billboard" + intToString(randNum, 2) + ".png", Texture.class);
 	}
 
 	public void dispose() {
 		texture.dispose();
-		speed = 0;
 	}
 
 	public float getOffset() {
@@ -42,10 +39,6 @@ public class Car {
 		return z;
 	}
 
-	public float getSpeed() {
-		return speed;
-	}
-
 	public int getHeight() {
 		return texture.getHeight();
 	}
@@ -54,34 +47,42 @@ public class Car {
 		return texture.getWidth();
 	}
 
+	public void updateCar(int z, float offset) {
+		this.z = z;
+		this.offset = offset;
+	}
+
 	public static String intToString(int num, int digits) {
 		String output = Integer.toString(num);
 		while (output.length() < digits) output = "0" + output;
 		return output;
 	}
 
-	public void updateCar(int z, float offset) {
-		this.z = z;
-		this.offset = offset;
-	}
-
 	public void draw(Batch batch, float x, float y, float width, float height, float percentageToDraw) {
 		batch.draw(texture, x, y + height * (1 - percentageToDraw), width, height * percentageToDraw, 0, percentageToDraw, 1, 0);
 	}
 
+	@Override
+	public String toString() {
+		return "Scenery{" +
+				"offset=" + offset +
+				", z=" + z +
+				'}';
+	}
+
 	public void render(PolygonSpriteBatch polygonSpriteBatch, float scale, float destX, float destY, float clipY) {
+
 
 		float destW = (getWidth() * scale) * GameParameters.ROAD_SCALE_FACTOR;
 		float destH = (getHeight() * scale) * GameParameters.ROAD_SCALE_FACTOR;
 
-		destX = destX + (destW * -0.5F);
+		destX = destX + (destW * (getOffset() < 0 ? -1 : 0));
 
 		float clipH = Math.max(0, destY + destH - clipY);
 		float amountToChop = clipH / destH;
-		float clamped = MathUtils.clamp(amountToChop, 0, 1);
+		float percentageToDraw = MathUtils.clamp(amountToChop, 0, 1);
 
-		if (clipH > 0) {
-			draw(polygonSpriteBatch, destX, destY, destW, destH, clamped);
-		}
+		draw(polygonSpriteBatch, destX, destY, destW, destH, percentageToDraw);
 	}
+
 }

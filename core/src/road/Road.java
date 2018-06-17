@@ -1,12 +1,12 @@
 package road;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.tecno.racer.GameParameters;
 import com.tecno.racer.GameState;
+import helpers.ScreenManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +20,9 @@ public class Road {
 	private PolygonSpriteBatch polygonSpriteBatch = new PolygonSpriteBatch();
 	private List<Car> cars = new ArrayList<>();
 
-	private static final Texture BACKGROUND_HILLS = new Texture("background/hills.png");
-	private static final Texture BACKGROUND_SKY = new Texture("background/sky.png");
-	private static final Texture BACKGROUND_TREES = new Texture("background/trees.png");
+	private static final Texture BACKGROUND_HILLS = ScreenManager.getInstance().assetManager.get("background/hills.png", Texture.class);
+	private static final Texture BACKGROUND_SKY = ScreenManager.getInstance().assetManager.get("background/sky.png", Texture.class);
+	private static final Texture BACKGROUND_TREES = ScreenManager.getInstance().assetManager.get("background/trees.png", Texture.class);
 
 	public Road(GameState state) {
 		this.state = state;
@@ -32,8 +32,8 @@ public class Road {
 		roadSegments.clear();
 
 		RoadBuilder roadBuilder = new RoadBuilder()
-				.addRightCurve(RoadBuilder.Length.SHORT, RoadBuilder.Curve.MEDIUM, RoadBuilder.Hills.HIGH)
-				.addLeftCurve(RoadBuilder.Length.SHORT, RoadBuilder.Curve.MEDIUM, RoadBuilder.Hills.HIGH)
+				.addRightCurve(RoadBuilder.Length.SHORT, RoadBuilder.Curve.TIGHT, RoadBuilder.Hills.NONE)
+				.addLeftCurve(RoadBuilder.Length.SHORT, RoadBuilder.Curve.TIGHT, RoadBuilder.Hills.HIGH)
 				.addRightCurve(RoadBuilder.Length.MEDIUM, RoadBuilder.Curve.LIGHT, RoadBuilder.Hills.HIGH)
 				.addLeftCurve(RoadBuilder.Length.MEDIUM, RoadBuilder.Curve.TIGHT, RoadBuilder.Hills.HIGH)
 				.addRightCurve(RoadBuilder.Length.LONG, RoadBuilder.Curve.LIGHT, RoadBuilder.Hills.MEDIUM)
@@ -51,6 +51,20 @@ public class Road {
 		this.state.trackLength = this.roadSegments.size() * GameParameters.SEGMENT_LENGTH;
 
 		resetCars();
+		resetScenery();
+	}
+
+	private void resetScenery() {
+		Scenery scenery;
+		float offset;
+		for (int n = 0; n < roadSegments.size(); n++) {
+			if (MathUtils.randomBoolean(0.1F)) {
+				RoadSegment roadSegment = roadSegments.get(n);
+				offset = MathUtils.randomBoolean() ? -1F - (float) (Math.random() * 1F) : 1F + (float) (Math.random() * 1F);
+				scenery = new Scenery(offset, 0);
+				roadSegment.addScenery(scenery);
+			}
+		}
 	}
 
 	public void resetCars() {
@@ -67,6 +81,16 @@ public class Road {
 			segment = findSegment(car.getZ());
 			segment.addCar(car);
 			cars.add(car);
+		}
+
+		Hole hole;
+		for (int n = 0; n < 50; n++) {
+			offset = (float) (Math.random() * MathUtils.random(-1F, 1F));
+			z = (int) (Math.floor(Math.random() * roadSegments.size()) * GameParameters.SEGMENT_LENGTH);
+			hole = new Hole(offset, z);
+			segment = findSegment(hole.getZ());
+			segment.addCar(hole);
+			cars.add(hole);
 		}
 	}
 
@@ -165,6 +189,19 @@ public class Road {
 
 		updateCars(delta, playerSegment, playerW);
 
+		if (((playerX < -1) || (playerX > 1)) && (state.player.getSpeed() > GameParameters.OFF_ROAD_LIMIT)) {
+			for (int n = 0; n < playerSegment.getScenery().size(); n++) {
+				Scenery scenery = playerSegment.getScenery().get(n);
+				float sceneryW = scenery.getWidth() * SPRITE_SCALE;
+				float sceneryX = scenery.getOffset() + sceneryW / 2 * (scenery.getOffset() > 0 ? 1 : -1);
+				if (overlap(playerX, playerW, sceneryX, sceneryW)) {
+					state.player.setSpeed(GameParameters.MAX_SPEED / 100);
+					state.position = Math.round(increase(playerSegment.getP1().world.z, -GameParameters.PLAYER_Z, state.trackLength)); // stop in front of sprite (at front of segment)
+					break;
+				}
+			}
+		}
+
 		for (int n = 0; n < playerSegment.getCars().size(); n++) {
 			Car car = playerSegment.getCars().get(n);
 			float carW = car.getWidth() * SPRITE_SCALE * 7;
@@ -223,6 +260,14 @@ public class Road {
 		// back to front painters algorithm
 		for (int n = (Math.min(DRAW_DISTANCE, roadSegments.size()) - 1); n > 0; n--) {
 			RoadSegment segment = roadSegments.get((baseSegment.getIndex() + n) % roadSegments.size());
+
+			for (int i = 0; i < segment.getScenery().size(); i++) {
+				Scenery scenery = segment.getScenery().get(i);
+				float spriteScale = segment.getP1().screen.scale;
+				float spriteX = segment.getP1().screen.x + (spriteScale * scenery.getOffset() * GameParameters.ROAD_WIDTH * GameParameters.WIDTH / 2);
+				float spriteY = segment.getP1().screen.y;
+				scenery.render(polygonSpriteBatch, spriteScale, spriteX, spriteY, segment.getClip());
+			}
 
 			// render other cars
 			for (int i = 0; i < segment.getCars().size(); i++) {

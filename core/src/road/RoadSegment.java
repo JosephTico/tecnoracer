@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.tecno.racer.GameParameters;
+import helpers.ScreenManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +13,13 @@ import java.util.List;
 import static com.tecno.racer.GameParameters.LANES;
 
 public class RoadSegment {
-	private static final TextureRegion DARK_ROAD = new TextureRegion(new Texture("background/dark_road.jpg"));
-	private static final TextureRegion LIGHT_ROAD = new TextureRegion(new Texture("background/light_road.jpg"));
-	private static final TextureRegion WHITE_LINE = new TextureRegion(new Texture("background/white_lines.jpg"));
-	private static final TextureRegion RED_RUMBLE = new TextureRegion(new Texture("background/red_rumble.jpg"));
-	private static final TextureRegion WHITE_RUMBLE = new TextureRegion(new Texture("background/white_rumble.jpg"));
-	private static final TextureRegion DARK_GRASS = new TextureRegion(new Texture("background/dark_grass.jpg"));
-	private static final TextureRegion LIGHT_GRASS = new TextureRegion(new Texture("background/light_grass.jpg"));
+	private static final TextureRegion DARK_ROAD = new TextureRegion(ScreenManager.getInstance().assetManager.get("background/dark_road.jpg", Texture.class));
+	private static final TextureRegion LIGHT_ROAD = new TextureRegion(ScreenManager.getInstance().assetManager.get("background/light_road.jpg", Texture.class));
+	private static final TextureRegion WHITE_LINE = new TextureRegion(ScreenManager.getInstance().assetManager.get("background/white_lines.jpg", Texture.class));
+	private static final TextureRegion RED_RUMBLE = new TextureRegion(ScreenManager.getInstance().assetManager.get("background/red_rumble.jpg", Texture.class));
+	private static final TextureRegion WHITE_RUMBLE = new TextureRegion(ScreenManager.getInstance().assetManager.get("background/white_rumble.jpg", Texture.class));
+	private static final TextureRegion DARK_GRASS = new TextureRegion(ScreenManager.getInstance().assetManager.get("background/dark_grass.jpg", Texture.class));
+	private static final TextureRegion LIGHT_GRASS = new TextureRegion(ScreenManager.getInstance().assetManager.get("background/light_grass.jpg", Texture.class));
 
 	private final Point p1;
 	private final Point p2;
@@ -30,7 +31,7 @@ public class RoadSegment {
 	private final float curve;
 
 	private List<Car> cars = new ArrayList<>();
-	//private List<Scenery> sceneries = new ArrayList<>();
+	private List<Scenery> sceneries = new ArrayList<>();
 
 
 
@@ -78,6 +79,14 @@ public class RoadSegment {
 
 	public float getCurve() {
 		return curve;
+	}
+
+	public void addScenery(Scenery scenery) {
+		this.sceneries.add(scenery);
+	}
+
+	public List<Scenery> getScenery() {
+		return sceneries;
 	}
 
 	public void draw(PolygonSpriteBatch polygonSpriteBatch) {
