@@ -240,6 +240,8 @@ public class MainMenu extends AbstractScreen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		super.act(delta);
 		super.draw();
+
+		Gdx.graphics.setContinuousRendering(false);
 	}
 
 	@Override

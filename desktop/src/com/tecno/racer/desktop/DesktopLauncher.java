@@ -1,20 +1,18 @@
 package com.tecno.racer.desktop;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.tecno.racer.TecnoRacer;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.tecno.racer.GameParameters;
+import com.tecno.racer.TecnoRacer;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 
-		config.title = "TecnoRacer";
-		config.width = GameParameters.WIDTH;
-		config.height = GameParameters.HEIGHT;
-		//config.fullscreen = true;
+		config.setTitle("TecnoRacer");
+		config.setWindowSizeLimits(GameParameters.WIDTH, GameParameters.HEIGHT, GameParameters.WIDTH, GameParameters.HEIGHT);
 
-
-		new LwjglApplication(new TecnoRacer(), config);
+		new Lwjgl3Application(new TecnoRacer(), config);
 	}
 }

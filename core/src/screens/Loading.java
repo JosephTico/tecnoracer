@@ -56,6 +56,8 @@ public class Loading extends AbstractScreen {
 		table.add(loadingLabel).expandX().center();
 
 		loadAssets();
+
+		Gdx.graphics.setContinuousRendering(true);
 	}
 
 	private void loadAssets() {

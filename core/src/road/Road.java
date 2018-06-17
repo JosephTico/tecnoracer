@@ -82,7 +82,7 @@ public class Road {
 		float offset;
 		int z;
 		float speed;
-		for (int n = 0; n < 25; n++) {
+		for (int n = 0; n < 250; n++) {
 			offset = (float) (Math.random() * MathUtils.random(-1F, 1F));
 			z = (int) (Math.floor(Math.random() * roadSegments.size()) * GameParameters.SEGMENT_LENGTH);
 			speed = 1000F + (float) (MathUtils.random(1000, 5000));//(float) (maxSpeed / 4 + Math.random() * maxSpeed / 2);//(sprite == SPRITES.SEMI ? 4 : 2);
@@ -117,7 +117,7 @@ public class Road {
 		for (int n = 0; n < 10; n++) {
 			offset = (float) (Math.random() * MathUtils.random(-1F, 1F));
 			z = (int) (Math.floor(Math.random() * roadSegments.size()) * GameParameters.SEGMENT_LENGTH);
-			item = new Item(offset, z, Item.Types.BOOST);
+			item = new Item(offset, z, Item.Types.LIFE);
 			segment = findSegment(item.getZ());
 			segment.addItem(item);
 			items.add(item);
@@ -154,7 +154,7 @@ public class Road {
 		Car otherCar;
 		float otherCarW;
 		int lookahead = 20;
-		float carW = car.getWidth() * SPRITE_SCALE;
+		float carW = car.getWidth() * SPRITE_SCALE * 6;
 		float playerX = state.player.getX();
 
 		// optimization, dont bother steering around other cars when 'out of sight' of the player
