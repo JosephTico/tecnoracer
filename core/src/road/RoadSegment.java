@@ -190,4 +190,16 @@ public class RoadSegment {
 	public List<Item> getItems() {
 		return items;
 	}
+
+	public void resetCars() {
+		this.cars = new ArrayList<Car>();
+	}
+
+	public void resetItems() {
+		this.items = new ArrayList<Item>();
+	}
+
+	public void resetBombs() {
+		this.bombs = new ArrayList<Bomb>();
+	}
 }

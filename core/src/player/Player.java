@@ -25,15 +25,22 @@ public class Player extends Actor {
 	public boolean keyFaster = false;
 	public boolean keySlower = false;
 
-	private static final Texture SPRITE_RIGHT = new Texture("sprites/player_right.png");
-	private static final Texture SPRITE_LEFT = new Texture("sprites/player_left.png");
-	private static final Texture SPRITE_STRAIGHT = new Texture("sprites/player_straight.png");
+	private static Texture SPRITE_RIGHT;
+	private static Texture SPRITE_LEFT;
+	private static Texture SPRITE_STRAIGHT;
 
-	private Texture currentTexture = SPRITE_RIGHT;
+	private Texture currentTexture;
 
-	private Sprite sprite = new Sprite(currentTexture);
+	private Sprite sprite;
 
 	public Player() {
+		SPRITE_RIGHT = ScreenManager.getInstance().assetManager.get("sprites/player_straight.png",  Texture.class);
+		SPRITE_LEFT = ScreenManager.getInstance().assetManager.get("sprites/player_straight.png",  Texture.class);
+		SPRITE_STRAIGHT = ScreenManager.getInstance().assetManager.get("sprites/player_straight.png",  Texture.class);
+
+		currentTexture = SPRITE_STRAIGHT;
+
+		sprite = new Sprite(currentTexture);
 
 		setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
 		setTouchable(Touchable.enabled);

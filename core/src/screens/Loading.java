@@ -16,10 +16,11 @@ import com.tecno.racer.ServerState;
 import helpers.AbstractScreen;
 import helpers.ScreenEnum;
 import helpers.ScreenManager;
-import jexxus.Server;
-import sockets.DatoSocket;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Loading extends AbstractScreen {
 
@@ -90,6 +91,15 @@ public class Loading extends AbstractScreen {
 		assMan.load("sprites/player_left.png", Texture.class);
 		assMan.load("sprites/player_right.png", Texture.class);
 		assMan.load("sprites/player_straight.png", Texture.class);
+		assMan.load("sprites/player_left2.png", Texture.class);
+		assMan.load("sprites/player_right2.png", Texture.class);
+		assMan.load("sprites/player_straight2.png", Texture.class);
+		assMan.load("sprites/player_left3.png", Texture.class);
+		assMan.load("sprites/player_right3.png", Texture.class);
+		assMan.load("sprites/player_straight3.png", Texture.class);
+		assMan.load("sprites/player_left4.png", Texture.class);
+		assMan.load("sprites/player_right4.png", Texture.class);
+		assMan.load("sprites/player_straight4.png", Texture.class);
 		assMan.load("sprites/tree1.png", Texture.class);
 		assMan.load("sprites/tree2.png", Texture.class);
 
@@ -131,7 +141,6 @@ public class Loading extends AbstractScreen {
 
 	public void setupServer() {
 		if (!serverSetupAlready) {
-			System.out.println("SETUP");
 			ServerState.getInstance().getClient().onMessage(data -> {
 				ServerState.getInstance().proccessInput(new String(data));
 			});
@@ -161,6 +170,7 @@ public class Loading extends AbstractScreen {
 					ScreenManager.getInstance().showScreen(ScreenEnum.GAME_STAGE);
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				loadingLabel.setText("Error: files missing");
 				error = true;
 			}

@@ -70,7 +70,7 @@ public class Road {
 	}
 
 	private void prepareServerData() {
-
+		cars = ServerState.getInstance().getCars();
 	}
 
 	private void resetScenery() {
@@ -218,14 +218,14 @@ public class Road {
 		float max1 = x1 + (w1 * half);
 		float min2 = x2 - (w2 * half);
 		float max2 = x2 + (w2 * half);
-		return !((max1 < min2) || (min1 > max2));
+		return !((max1 < min2) || (min1 > max2) );
 	}
 
 
 	public void sendDataServer() {
 
 		try {
-			String data = "{ \"id\": " + ServerState.getInstance().getId() +", \"x\": " + state.player.getX() +", \"position\": " + state.position + ", \"speed\": " + state.player.getSpeed() +", \"life\": " + state.lives + " }\0";
+			String data = "{ \"id\": " + ServerState.getInstance().getId() +", \"x\": " + state.player.getX() +", \"position\": " + state.position + ", \"speed\": " + Math.round(state.player.getSpeed() / GameParameters.MAX_SPEED  * 180) +", \"life\": " + state.lives + " }\0";
 			ServerState.getInstance().getClient().send(data.getBytes());
 		} catch (Exception e) {
 			ServerState.getInstance().setMultiplayer(false);
@@ -233,10 +233,28 @@ public class Road {
 		}
 	}
 
+	private void getDataServer() {
+
+		for (RoadSegment segment : roadSegments) {
+			segment.resetCars();
+		}
+
+		List<Car> tempCars = ServerState.getInstance().getCars();
+
+		RoadSegment segment;
+		for (Car car : tempCars) {
+			segment = findSegment(car.getZ());
+			segment.addCar(car);
+		}
+	}
+
 	public void update(float delta) {
 
-		if (ServerState.getInstance().isMultiplayer())
+		if (ServerState.getInstance().isMultiplayer()) {
 			sendDataServer();
+			getDataServer();
+		}
+
 
 		RoadSegment playerSegment = findSegment(Math.round(state.position + GameParameters.PLAYER_Z));
 		float playerX = state.player.getX();

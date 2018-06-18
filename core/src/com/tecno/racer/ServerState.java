@@ -4,6 +4,10 @@ import helpers.ScreenEnum;
 import helpers.ScreenManager;
 import jexxus.Client;
 import org.json.*;
+import road.Car;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerState {
 	private boolean multiplayer;
@@ -12,6 +16,7 @@ public class ServerState {
 	private String host;
 	private int port;
 	private boolean multiplayerReady = false;
+	private List<Car> cars = new ArrayList<Car>();
 
 	public int getId() {
 		return id;
@@ -75,20 +80,48 @@ public class ServerState {
 
 	public void proccessInput(String data) {
 		data = data.substring(0, data.length() - 1);
-		System.out.println(data);
+		System.out.println("Recibiendo");
 
 		try {
 			JSONObject json = new JSONObject(data);
 			if (json.has("id")) {
 				setId(json.getInt("id"));
 			}
+			if (json.has("players")) {
+				setPlayers(json.getJSONArray("players"));
+			}
 		} catch (JSONException e) {
-			System.err.println("Invalid message: " + e);
+			System.out.println("Mensaje invalido ignorado");
+		}
+	}
+
+	private void setPlayers(JSONArray players) {
+		cars.clear();
+		int num = 1;
+		for (int i=0; i < players.length(); i++) {
+			JSONObject player = players.getJSONObject(i);
+			int pos = player.getInt("position");
+			float x = player.getFloat("x");
+			int id = player.getInt("id");
+
+			if (id == ServerState.getInstance().getId() || id == 0)
+				return;
+
+			num++;
+
+			Car tempCar = new Car(x,pos,0, num);
+			System.out.println("CAR " + id + " " +tempCar);
+
+			cars.add(tempCar);
 		}
 	}
 
 	public void setId(int id) {
 		this.id = id;
 		setMultiplayerReady(true);
+	}
+
+	public List<Car> getCars() {
+		return cars;
 	}
 }

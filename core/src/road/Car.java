@@ -20,6 +20,14 @@ public class Car {
 	protected int z;
 	protected float speed;
 
+	public Car(float offset, int z, float speed, int playerId) {
+		this.offset = offset;
+		this.z = z;
+		this.speed = speed;
+		Random rand = new Random();
+		texture = ScreenManager.getInstance().assetManager.get("sprites/player_straight" + playerId + ".png");
+	}
+
 	public Car(float offset, int z, float speed) {
 		this.offset = offset;
 		this.z = z;
