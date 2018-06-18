@@ -1,14 +1,23 @@
 package com.tecno.racer;
 
+import helpers.ScreenEnum;
+import helpers.ScreenManager;
 import jexxus.Client;
+import org.json.*;
 
 public class ServerState {
-	private  boolean multiplayer;
+	private boolean multiplayer;
 	private static ServerState ourInstance = new ServerState();
 	private Client client;
 	private String host;
 	private int port;
-	private boolean multiplayerReady;
+	private boolean multiplayerReady = false;
+
+	public int getId() {
+		return id;
+	}
+
+	private int id;
 
 	private ServerState() {
 
@@ -19,7 +28,7 @@ public class ServerState {
 	}
 
 	public static void resetInstance() {
-		if (ourInstance.getClient().isConnected())
+		if (ourInstance.getClient() != null && ourInstance.getClient().isConnected())
 			ourInstance.getClient().exit();
 		ourInstance = new ServerState();
 	}
@@ -65,7 +74,21 @@ public class ServerState {
 	}
 
 	public void proccessInput(String data) {
+		data = data.substring(0, data.length() - 1);
 		System.out.println(data);
+
+		try {
+			JSONObject json = new JSONObject(data);
+			if (json.has("id")) {
+				setId(json.getInt("id"));
+			}
+		} catch (JSONException e) {
+			System.err.println("Invalid message: " + e);
+		}
+	}
+
+	public void setId(int id) {
+		this.id = id;
 		setMultiplayerReady(true);
 	}
 }

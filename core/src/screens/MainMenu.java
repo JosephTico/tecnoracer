@@ -33,6 +33,8 @@ public class MainMenu extends AbstractScreen {
 
 	@Override
 	public void show() {
+		ServerState.resetInstance();
+
 		//Stage should controll input:
 		Gdx.input.setInputProcessor(this);
 

@@ -1,6 +1,5 @@
 package road;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,7 +9,6 @@ import com.tecno.racer.GameParameters;
 import com.tecno.racer.GameState;
 import com.tecno.racer.ServerState;
 import helpers.ScreenManager;
-import jexxus.Server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +23,6 @@ public class Road {
 	private List<Car> cars = new ArrayList<Car>();
 	private List<Bomb> bombs = new ArrayList<Bomb>();
 	private List<Item> items = new ArrayList<Item>();
-	private boolean serverReady = false;
 
 	private static final Texture BACKGROUND_HILLS = ScreenManager.getInstance().assetManager.get("background/hills.png", Texture.class);
 	private static final Texture BACKGROUND_SKY = ScreenManager.getInstance().assetManager.get("background/sky.png", Texture.class);
@@ -62,10 +59,18 @@ public class Road {
 
 		this.state.trackLength = this.roadSegments.size() * GameParameters.SEGMENT_LENGTH;
 
-		resetCars();
+		if (ServerState.getInstance().isMultiplayer()) {
+			prepareServerData();
+		} else {
+			resetCars();
+			resetBombs();
+			resetItems();
+		}
 		resetScenery();
-		resetBombs();
-		resetItems();
+	}
+
+	private void prepareServerData() {
+
 	}
 
 	private void resetScenery() {
@@ -216,20 +221,11 @@ public class Road {
 		return !((max1 < min2) || (min1 > max2));
 	}
 
-	public void readyServer() {
-		/*ServerState.getInstance().getClient().onMessage(data -> {
-			System.out.println("Client received: " + new String(data));
-			ServerState.getInstance().getClient().send("Client says hi!\0".getBytes());
-		});*/
-		serverReady = true;
-	}
 
-	public void updateServer() {
-		if (!serverReady)
-			readyServer();
+	public void sendDataServer() {
 
 		try {
-			String data = "{ \"id\": 12, \"x\": 56, \"position\": 34, \"speed\": 78, \"life\": 90 }\0";
+			String data = "{ \"id\": " + ServerState.getInstance().getId() +", \"x\": " + state.player.getX() +", \"position\": " + state.position + ", \"speed\": " + state.player.getSpeed() +", \"life\": " + state.lives + " }\0";
 			ServerState.getInstance().getClient().send(data.getBytes());
 		} catch (Exception e) {
 			ServerState.getInstance().setMultiplayer(false);
@@ -240,7 +236,7 @@ public class Road {
 	public void update(float delta) {
 
 		if (ServerState.getInstance().isMultiplayer())
-			updateServer();
+			sendDataServer();
 
 		RoadSegment playerSegment = findSegment(Math.round(state.position + GameParameters.PLAYER_Z));
 		float playerX = state.player.getX();

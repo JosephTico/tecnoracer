@@ -131,6 +131,7 @@ public class Loading extends AbstractScreen {
 
 	public void setupServer() {
 		if (!serverSetupAlready) {
+			System.out.println("SETUP");
 			ServerState.getInstance().getClient().onMessage(data -> {
 				ServerState.getInstance().proccessInput(new String(data));
 			});
@@ -189,8 +190,7 @@ public class Loading extends AbstractScreen {
 					error = true;
 					isConnecting = false;
 				}
-			} else if (!isConnecting) {
-				ServerState.resetInstance();
+			} else if (!isConnecting && error) {
 				loadingLabel.setText("Connection error");
 			}
 
