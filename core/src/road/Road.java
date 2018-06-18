@@ -239,10 +239,11 @@ public class Road {
 			segment.resetCars();
 		}
 
-		List<Car> tempCars = ServerState.getInstance().getCars();
-
 		RoadSegment segment;
-		for (Car car : tempCars) {
+		for (Car car : cars) {
+			if (car.getZ() > state.trackLength) {
+				car.setZ(state.trackLength);
+			}
 			segment = findSegment(car.getZ());
 			segment.addCar(car);
 		}

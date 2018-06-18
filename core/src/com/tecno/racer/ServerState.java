@@ -10,19 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerState {
-	private boolean multiplayer;
 	private static ServerState ourInstance = new ServerState();
+	private boolean multiplayer;
 	private Client client;
 	private String host;
 	private int port;
 	private boolean multiplayerReady = false;
 	private List<Car> cars = new ArrayList<Car>();
-
-	public int getId() {
-		return id;
-	}
-
-	private int id;
+	private int id = 1;
 
 	private ServerState() {
 
@@ -36,6 +31,15 @@ public class ServerState {
 		if (ourInstance.getClient() != null && ourInstance.getClient().isConnected())
 			ourInstance.getClient().exit();
 		ourInstance = new ServerState();
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+		setMultiplayerReady(true);
 	}
 
 	public void newClient(String ip) {
@@ -80,7 +84,7 @@ public class ServerState {
 
 	public void proccessInput(String data) {
 		data = data.substring(0, data.length() - 1);
-		System.out.println("Recibiendo");
+		System.out.println(data);
 
 		try {
 			JSONObject json = new JSONObject(data);
@@ -97,28 +101,20 @@ public class ServerState {
 
 	private void setPlayers(JSONArray players) {
 		cars.clear();
-		int num = 1;
 		for (int i=0; i < players.length(); i++) {
 			JSONObject player = players.getJSONObject(i);
-			int pos = player.getInt("position");
+			int pos = player.getInt("position") + GameParameters.SEGMENT_LENGTH * 4 + 48;
 			float x = player.getFloat("x");
 			int id = player.getInt("id");
 
 			if (id == ServerState.getInstance().getId() || id == 0)
-				return;
+				continue;
 
-			num++;
-
-			Car tempCar = new Car(x,pos,0, num);
+			Car tempCar = new Car(x,pos,0, id);
 			System.out.println("CAR " + id + " " +tempCar);
 
 			cars.add(tempCar);
 		}
-	}
-
-	public void setId(int id) {
-		this.id = id;
-		setMultiplayerReady(true);
 	}
 
 	public List<Car> getCars() {

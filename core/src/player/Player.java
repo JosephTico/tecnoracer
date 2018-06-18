@@ -34,9 +34,9 @@ public class Player extends Actor {
 	private Sprite sprite;
 
 	public Player() {
-		SPRITE_RIGHT = ScreenManager.getInstance().assetManager.get("sprites/player_straight.png",  Texture.class);
-		SPRITE_LEFT = ScreenManager.getInstance().assetManager.get("sprites/player_straight.png",  Texture.class);
-		SPRITE_STRAIGHT = ScreenManager.getInstance().assetManager.get("sprites/player_straight.png",  Texture.class);
+		SPRITE_RIGHT = ScreenManager.getInstance().assetManager.get("sprites/player_right" + ServerState.getInstance().getId() + ".png",  Texture.class);
+		SPRITE_LEFT = ScreenManager.getInstance().assetManager.get("sprites/player_left" + ServerState.getInstance().getId() + ".png",  Texture.class);
+		SPRITE_STRAIGHT = ScreenManager.getInstance().assetManager.get("sprites/player_straight" + ServerState.getInstance().getId() + ".png",  Texture.class);
 
 		currentTexture = SPRITE_STRAIGHT;
 

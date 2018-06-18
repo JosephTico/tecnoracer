@@ -88,9 +88,9 @@ public class Loading extends AbstractScreen {
 		assMan.load("sprites/car02.png", Texture.class);
 		assMan.load("sprites/car03.png", Texture.class);
 		assMan.load("sprites/car04.png", Texture.class);
-		assMan.load("sprites/player_left.png", Texture.class);
-		assMan.load("sprites/player_right.png", Texture.class);
-		assMan.load("sprites/player_straight.png", Texture.class);
+		assMan.load("sprites/player_left1.png", Texture.class);
+		assMan.load("sprites/player_right1.png", Texture.class);
+		assMan.load("sprites/player_straight1.png", Texture.class);
 		assMan.load("sprites/player_left2.png", Texture.class);
 		assMan.load("sprites/player_right2.png", Texture.class);
 		assMan.load("sprites/player_straight2.png", Texture.class);
