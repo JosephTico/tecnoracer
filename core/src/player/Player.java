@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.tecno.racer.GameParameters;
 import com.tecno.racer.GameState;
+import com.tecno.racer.ServerState;
 import helpers.ScreenEnum;
 import helpers.ScreenManager;
 import road.RoadSegment;
@@ -78,6 +79,8 @@ public class Player extends Actor {
 
 
 		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+			if (ServerState.getInstance().isMultiplayer() && ServerState.getInstance().getClient() != null)
+				ServerState.getInstance().getClient().exit();
 			ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
 		}
 

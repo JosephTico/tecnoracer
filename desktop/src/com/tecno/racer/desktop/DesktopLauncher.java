@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.tecno.racer.GameParameters;
+import com.tecno.racer.ServerState;
 import com.tecno.racer.TecnoRacer;
 
 public class DesktopLauncher {
@@ -13,6 +14,14 @@ public class DesktopLauncher {
 		config.setTitle("TecnoRacer");
 		config.setWindowSizeLimits(GameParameters.WIDTH, GameParameters.HEIGHT, GameParameters.WIDTH, GameParameters.HEIGHT);
 
-		new Lwjgl3Application(new TecnoRacer(), config);
+		new Lwjgl3Application(new TecnoRacer(), config) {
+			@Override
+			public void exit() {
+				super.exit();
+				if (ServerState.getInstance().getClient() != null)
+					ServerState.getInstance().getClient().exit();
+				System.exit(0);
+			}
+		};
 	}
 }

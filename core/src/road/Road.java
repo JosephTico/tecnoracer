@@ -1,12 +1,16 @@
 package road;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.tecno.racer.GameParameters;
 import com.tecno.racer.GameState;
+import com.tecno.racer.ServerState;
 import helpers.ScreenManager;
+import jexxus.Server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +25,7 @@ public class Road {
 	private List<Car> cars = new ArrayList<Car>();
 	private List<Bomb> bombs = new ArrayList<Bomb>();
 	private List<Item> items = new ArrayList<Item>();
+	private boolean serverReady = false;
 
 	private static final Texture BACKGROUND_HILLS = ScreenManager.getInstance().assetManager.get("background/hills.png", Texture.class);
 	private static final Texture BACKGROUND_SKY = ScreenManager.getInstance().assetManager.get("background/sky.png", Texture.class);
@@ -117,7 +122,7 @@ public class Road {
 		for (int n = 0; n < 10; n++) {
 			offset = (float) (Math.random() * MathUtils.random(-1F, 1F));
 			z = (int) (Math.floor(Math.random() * roadSegments.size()) * GameParameters.SEGMENT_LENGTH);
-			item = new Item(offset, z, Item.Types.LIFE);
+			item = new Item(offset, z, Item.Types.BOOST);
 			segment = findSegment(item.getZ());
 			segment.addItem(item);
 			items.add(item);
@@ -211,7 +216,32 @@ public class Road {
 		return !((max1 < min2) || (min1 > max2));
 	}
 
+	public void readyServer() {
+		/*ServerState.getInstance().getClient().onMessage(data -> {
+			System.out.println("Client received: " + new String(data));
+			ServerState.getInstance().getClient().send("Client says hi!\0".getBytes());
+		});*/
+		serverReady = true;
+	}
+
+	public void updateServer() {
+		if (!serverReady)
+			readyServer();
+
+		try {
+			String data = "{ \"id\": 12, \"x\": 56, \"position\": 34, \"speed\": 78, \"life\": 90 }\0";
+			ServerState.getInstance().getClient().send(data.getBytes());
+		} catch (Exception e) {
+			ServerState.getInstance().setMultiplayer(false);
+			System.out.println("Desconectado");
+		}
+	}
+
 	public void update(float delta) {
+
+		if (ServerState.getInstance().isMultiplayer())
+			updateServer();
+
 		RoadSegment playerSegment = findSegment(Math.round(state.position + GameParameters.PLAYER_Z));
 		float playerX = state.player.getX();
 
@@ -256,6 +286,7 @@ public class Road {
 			float bombW = bomb.getWidth() * SPRITE_SCALE * 6;
 			if (state.player.getSpeed() > 0 && bomb.isActive()) {
 				if (overlap(playerX, playerW, bomb.getOffset(), bombW, 0.8F)) {
+					ScreenManager.getInstance().assetManager.get("music/explosion.mp3", Sound.class).play(0.3f);
 					state.player.setSpeed(0);
 					state.position = Math.round(increase(bomb.getZ(), -GameParameters.PLAYER_Z, state.trackLength));
 					bomb.setActive(false);
