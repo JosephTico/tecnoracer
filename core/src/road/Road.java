@@ -167,19 +167,19 @@ public class Road {
 	}
 
 	private void updateCars(float delta, RoadSegment playerSegment, float playerW) {
-		Car car;
 		RoadSegment oldSegment;
 		RoadSegment newSegment;
-		for (int n = 0; n < cars.size(); n++) {
-			car = cars.get(n);
-			oldSegment = findSegment(car.getZ());
-			float offset = car.getOffset() + updateCarOffset(car, oldSegment, playerSegment, playerW);
-			int z = Math.round(increase(car.getZ(), delta * car.getSpeed(), state.trackLength));
-			car.updateCar(z, offset);
-			newSegment = findSegment(car.getZ());
-			if (oldSegment != newSegment) {
-				oldSegment.getCars().remove(car);
-				newSegment.getCars().add(car);
+		synchronized (cars) {
+			for (Car car : cars) {
+				oldSegment = findSegment(car.getZ());
+				float offset = car.getOffset() + updateCarOffset(car, oldSegment, playerSegment, playerW);
+				int z = Math.round(increase(car.getZ(), delta * car.getSpeed(), state.trackLength));
+				car.updateCar(z, offset);
+				newSegment = findSegment(car.getZ());
+				if (oldSegment != newSegment) {
+					oldSegment.getCars().remove(car);
+					newSegment.getCars().add(car);
+				}
 			}
 		}
 	}

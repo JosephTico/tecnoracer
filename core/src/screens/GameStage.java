@@ -16,7 +16,6 @@ import helpers.AbstractScreen;
 import helpers.ScreenManager;
 import road.Car;
 
-import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 public class GameStage extends AbstractScreen {
@@ -162,6 +161,9 @@ public class GameStage extends AbstractScreen {
 	@Override
 	public void dispose() {
 		super.dispose();
+		if (ServerState.getInstance().getClient() != null) {
+			ServerState.getInstance().getClient().exit();
+		}
 		state.music.setVolume(0);
 		state.accel.setVolume(accelId, 0);
 	}
