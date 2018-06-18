@@ -54,7 +54,7 @@ public class MainMenu extends AbstractScreen {
 
 
 		Table right = new Table();
-		content.add(right).padLeft(25.0f);
+		content.add(right).padLeft(60.0f);
 
 
 		Table table = new Table(skin);
