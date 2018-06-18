@@ -2,6 +2,7 @@ package player;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
@@ -60,6 +61,11 @@ public class Player extends Actor {
 	};
 
 	public void update(float delta, GameState state) {
+		if (state.position > state.trackLength - 200*GameParameters.SEGMENT_LENGTH) {
+			state.score += 2500*(4 - state.posMultiplayer);
+			ScreenManager.getInstance().score = state.score;
+			ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
+		}
 		state.position = Math.round(increase(state.position, delta * speed, state.trackLength));
 
 		float speedPercent = speed / GameParameters.MAX_SPEED;
@@ -88,12 +94,16 @@ public class Player extends Actor {
 		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
 			if (ServerState.getInstance().isMultiplayer() && ServerState.getInstance().getClient() != null)
 				ServerState.getInstance().getClient().exit();
+			ScreenManager.getInstance().assetManager.get("music/exit.wav", Sound.class).play(2f);
 			ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
+
+
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isTouched()) {
 			speed = accelerate(speed, GameParameters.ACCEL, delta);
 		} else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+			ScreenManager.getInstance().assetManager.get("music/breaks.wav", Sound.class).play(0.3f);
 			speed = accelerate(speed, GameParameters.BREAKING, delta);
 		} else {
 			speed = accelerate(speed, GameParameters.DECEL, delta);

@@ -61,6 +61,7 @@ public class MainMenu extends AbstractScreen {
 		table.setBackground("window-c");
 		right.add(table).height(60.0f).width(200.0f).padBottom(30);
 
+
 		Label label = new Label("Configuration", skin);
 		table.add(label).expandX().center();
 
@@ -90,6 +91,18 @@ public class MainMenu extends AbstractScreen {
 		TextField portField = new TextField("1973", skin);
 		portField.setTextFieldFilter(new DigitFilter());
 		table.add(portField).center();
+
+		if (ScreenManager.getInstance().score > 0) {
+			right.row();
+			table = new Table(skin);
+			table.setBackground("window-c");
+			right.add(table).height(60.0f).width(200.0f).padBottom(30);
+
+
+			label = new Label("Last score: " + ScreenManager.getInstance().score, skin);
+			table.add(label).expandX().center();
+
+		}
 
 		content.row();
 		table = new Table(skin);

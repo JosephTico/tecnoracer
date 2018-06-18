@@ -2,6 +2,7 @@ package screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -10,9 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.tecno.racer.GameParameters;
 import com.tecno.racer.GameState;
+import com.tecno.racer.ServerState;
 import helpers.AbstractScreen;
 import helpers.ScreenManager;
+import road.Car;
 
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 public class GameStage extends AbstractScreen {
@@ -26,6 +30,9 @@ public class GameStage extends AbstractScreen {
 	Label rightLabel;
 	Label debugLabel;
 	int frameCounter = 0;
+	long accelId;
+	Label posLabel;
+
 
 	public GameStage() {
 		super();
@@ -38,6 +45,8 @@ public class GameStage extends AbstractScreen {
 		state = new GameState();
 		state.road.resetRoad();
 		state.music = ScreenManager.getInstance().assetManager.get("music/racer.mp3", Music.class);
+		state.music.setLooping(true);
+		state.accel = ScreenManager.getInstance().assetManager.get("music/accel.wav", Sound.class);
 		addActor(state.player);
 		state.music.play();
 
@@ -51,6 +60,22 @@ public class GameStage extends AbstractScreen {
 
 		leftLabel = new Label("Speed", skin);
 		leftTable.add(leftLabel).expandX().center();
+
+
+		if (ServerState.getInstance().isMultiplayer()) {
+			Table centerTable;
+			centerTable = new Table(skin);
+			centerTable.setBackground("window-c");
+			centerTable.setWidth(60f);
+			centerTable.setHeight(60f);
+			centerTable.setY(GameParameters.HEIGHT - centerTable.getHeight() - 10);
+			centerTable.setX(GameParameters.WIDTH / 2 - centerTable.getWidth() / 2);
+			addActor(centerTable);
+
+			posLabel = new Label("#1", skin);
+			centerTable.add(posLabel);
+
+		}
 
 
 		Table rightTable;
@@ -79,12 +104,18 @@ public class GameStage extends AbstractScreen {
 
 		startTime = TimeUtils.millis();
 
+		accelId = state.accel.loop(0f);
+
 
 	}
 
 
 	@Override
 	public void render(float delta) {
+		state.music.setVolume(0f);
+		state.accel.setPitch(accelId, state.player.getSpeed() / GameParameters.MAX_SPEED * 2f);
+		state.accel.setPan(accelId, state.player.getX()/3, state.player.getSpeed() / (GameParameters.MAX_SPEED));
+
 		frameCounter++;
 		long elapsedTime = TimeUtils.timeSinceMillis(startTime);
 		Gdx.gl.glClearColor(0, 1, 0, 1);
@@ -92,6 +123,7 @@ public class GameStage extends AbstractScreen {
 
 		if (frameCounter == 30) {
 			state.score++;
+			state.score += Math.round(state.player.getSpeed()/GameParameters.MAX_SPEED) * 10;
 			frameCounter = 0;
 		}
 
@@ -104,18 +136,33 @@ public class GameStage extends AbstractScreen {
 		leftLabel.setText("Speed: " + Math.round(state.player.getSpeed() / GameParameters.MAX_SPEED  * 180) + "kph\nScore: " + String.format("%08d", state.score) +"\nTime: " + time);
 		rightLabel.setText("Lives: " + state.lives);
 		debugLabel.setText("X: " + state.player.getX() +  "\nPos: " + state.position +  "\nLength: " + state.trackLength + "\nSegment: " + Math.round(state.position / GameParameters.SEGMENT_LENGTH) + " of " + Math.round(state.trackLength / GameParameters.SEGMENT_LENGTH));
+
+
+		state.posMultiplayer = 1;
+		if (ServerState.getInstance().isMultiplayer()) {
+			synchronized(ServerState.getInstance().getCars()) {
+				for (Car car : ServerState.getInstance().getCars()) {
+					if (car.getZ() > state.position + GameParameters.OTHER_PLAYER_Z_FIX) {
+						state.posMultiplayer++;
+					}
+				}
+			}
+
+			posLabel.setText("#" + state.posMultiplayer);
+		}
+
 		state.player.update(delta, state);
 		state.road.update(delta);
 		state.road.render(getCamera());
 		super.act(delta);
-		state.music.setVolume(state.player.getSpeed() / (GameParameters.MAX_SPEED * 3f));
 		super.draw();
 			}
 
 	@Override
 	public void dispose() {
-		state.music.dispose();
 		super.dispose();
+		state.music.setVolume(0);
+		state.accel.setVolume(accelId, 0);
 	}
 
 }

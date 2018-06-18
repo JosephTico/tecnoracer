@@ -12,6 +12,8 @@ public class ScreenManager {
 	// Reference to AssetManager
 	public AssetManager assetManager;
 
+	public int score = 0;
+
 	// Reference to game
 	private Game game;
 

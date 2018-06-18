@@ -81,8 +81,29 @@ public class RoadBuilder {
 		return this;
 	}
 
+	public RoadBuilder addFinishLine(Length length) {
+		addRoad(length.size, 0, 0, 0, 0, true);
+		return this;
+	}
+
 	public List<RoadSegment> build() {
 		return Collections.unmodifiableList(roadSegments);
+	}
+
+	private void addRoad(int enter, int hold, int leave, int curve, float y, boolean finish) {
+		float startY = lastY();
+		float endY = startY + (y * GameParameters.SEGMENT_LENGTH);
+		int n;
+		float total = enter + hold + leave;
+		for (n = 0; n < enter; n++) {
+			addSegment(easeIn(0, curve, n / (float) enter), easeInOut(startY, endY, n / total), true);
+		}
+		for (n = 0; n < hold; n++) {
+			addSegment(curve, easeInOut(startY, endY, (enter + n) / total), true);
+		}
+		for (n = 0; n < leave; n++) {
+			addSegment(easeInOut(curve, 0, n / (float) leave), easeInOut(startY, endY, (enter + hold + n) / total), true);
+		}
 	}
 
 
@@ -92,17 +113,18 @@ public class RoadBuilder {
 		int n;
 		float total = enter + hold + leave;
 		for (n = 0; n < enter; n++) {
-			addSegment(easeIn(0, curve, n / (float) enter), easeInOut(startY, endY, n / total));
+			addSegment(easeIn(0, curve, n / (float) enter), easeInOut(startY, endY, n / total),false);
 		}
 		for (n = 0; n < hold; n++) {
-			addSegment(curve, easeInOut(startY, endY, (enter + n) / total));
+			addSegment(curve, easeInOut(startY, endY, (enter + n) / total), false);
 		}
 		for (n = 0; n < leave; n++) {
-			addSegment(easeInOut(curve, 0, n / (float) leave), easeInOut(startY, endY, (enter + hold + n) / total));
+			addSegment(easeInOut(curve, 0, n / (float) leave), easeInOut(startY, endY, (enter + hold + n) / total), false);
 		}
 	}
 
-	private void addSegment(float curve, float y) {
+	private void addSegment(float curve, float y, boolean finish) {
+
 		int index = roadSegments.size();
 		Point p1 = new Point();
 		p1.world.z = index * GameParameters.SEGMENT_LENGTH;
@@ -110,11 +132,19 @@ public class RoadBuilder {
 		Point p2 = new Point();
 		p2.world.z = (index + 1) * GameParameters.SEGMENT_LENGTH;
 		p2.world.y = y;
-		roadSegments.add(
-				Math.floor(index / GameParameters.RUMBLE_LENGTH) % 2 == 1 ?
-						RoadSegment.createDarkRoadSegment(index, p1, p2, curve) :
-						RoadSegment.createLightRoadSegment(index, p1, p2, curve)
-		);
+		if (finish) {
+			roadSegments.add(
+					Math.floor(index / GameParameters.RUMBLE_LENGTH) % 2 == 1 ?
+							RoadSegment.createFinishRoadSegment(index, p1, p2, curve) :
+							RoadSegment.createFinishRoadSegment(index, p1, p2, curve)
+			);
+		} else {
+			roadSegments.add(
+			Math.floor(index / GameParameters.RUMBLE_LENGTH) % 2 == 1 ?
+					RoadSegment.createDarkRoadSegment(index, p1, p2, curve) :
+					RoadSegment.createLightRoadSegment(index, p1, p2, curve)
+			);
+		}
 	}
 
 	private float lastY() {

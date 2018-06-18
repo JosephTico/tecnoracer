@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.tecno.racer.GameParameters;
 import com.tecno.racer.GameState;
 import com.tecno.racer.ServerState;
+import helpers.ScreenEnum;
 import helpers.ScreenManager;
 
 import java.util.ArrayList;
@@ -51,8 +52,17 @@ public class Road {
 				.addHill(RoadBuilder.Length.SHORT, RoadBuilder.Hills.HIGH)
 				.addDip(RoadBuilder.Length.SHORT, RoadBuilder.Hills.HIGH)
 				.addStraight(RoadBuilder.Length.MEDIUM)
+				.addLeftCurve(RoadBuilder.Length.MEDIUM, RoadBuilder.Curve.TIGHT, RoadBuilder.Hills.HIGH)
+				.addLeftCurve(RoadBuilder.Length.MEDIUM, RoadBuilder.Curve.TIGHT, RoadBuilder.Hills.HIGH)
+				.addRightCurve(RoadBuilder.Length.MEDIUM, RoadBuilder.Curve.TIGHT, RoadBuilder.Hills.LOW)
+				.addDip(RoadBuilder.Length.LONG, RoadBuilder.Hills.HIGH)
+				.addDip(RoadBuilder.Length.SHORT, RoadBuilder.Hills.LOW)
 				.addRightCurve(RoadBuilder.Length.LONG, RoadBuilder.Curve.LIGHT, RoadBuilder.Hills.NONE)
 				.addLeftCurve(RoadBuilder.Length.LONG, RoadBuilder.Curve.TIGHT, RoadBuilder.Hills.NONE)
+				.addStraight(RoadBuilder.Length.LONG)
+				.addStraight(RoadBuilder.Length.LONG)
+				.addFinishLine(RoadBuilder.Length.SHORT)
+				.addStraight(RoadBuilder.Length.LONG)
 				.addStraight(RoadBuilder.Length.LONG);
 
 		roadSegments = roadBuilder.build();
@@ -77,11 +87,25 @@ public class Road {
 		Scenery scenery;
 		float offset;
 		for (int n = 0; n < roadSegments.size(); n++) {
+			RoadSegment roadSegment = roadSegments.get(n);
 			if (MathUtils.randomBoolean(0.1F)) {
-				RoadSegment roadSegment = roadSegments.get(n);
 				offset = MathUtils.randomBoolean() ? -1F - (float) (Math.random() * 1F) : 1F + (float) (Math.random() * 1F);
 				scenery = new Scenery(offset, 0);
 				roadSegment.addScenery(scenery);
+			}
+
+			String treeSprite;
+			if (MathUtils.randomBoolean(0.7F)) {
+				treeSprite = "tree1.png";
+			} else if (MathUtils.randomBoolean(0.7F)) {
+				treeSprite = "tree2.png";
+			} else {
+				treeSprite = "stump.png";
+			}
+
+			if (n % 10 == 0) {
+				roadSegment.addScenery(new Scenery(-2F, 0, treeSprite));
+				roadSegment.addScenery(new Scenery(2F, 0, treeSprite));
 			}
 		}
 	}
@@ -92,7 +116,7 @@ public class Road {
 		float offset;
 		int z;
 		float speed;
-		for (int n = 0; n < 250; n++) {
+		for (int n = 0; n < 150; n++) {
 			offset = (float) (Math.random() * MathUtils.random(-1F, 1F));
 			z = (int) (Math.floor(Math.random() * roadSegments.size()) * GameParameters.SEGMENT_LENGTH);
 			speed = 1000F + (float) (MathUtils.random(1000, 5000));//(float) (maxSpeed / 4 + Math.random() * maxSpeed / 2);//(sprite == SPRITES.SEMI ? 4 : 2);
@@ -124,10 +148,14 @@ public class Road {
 		RoadSegment segment;
 		float offset;
 		int z;
-		for (int n = 0; n < 10; n++) {
+		for (int n = 0; n < 20; n++) {
 			offset = (float) (Math.random() * MathUtils.random(-1F, 1F));
 			z = (int) (Math.floor(Math.random() * roadSegments.size()) * GameParameters.SEGMENT_LENGTH);
-			item = new Item(offset, z, Item.Types.BOOST);
+			if (MathUtils.randomBoolean(0.85f)) {
+				item = new Item(offset, z, Item.Types.BOOST);
+			} else {
+				item = new Item(offset, z, Item.Types.LIFE);
+			}
 			segment = findSegment(item.getZ());
 			segment.addItem(item);
 			items.add(item);
@@ -240,16 +268,22 @@ public class Road {
 		}
 
 		RoadSegment segment;
-		for (Car car : cars) {
-			if (car.getZ() > state.trackLength) {
-				car.setZ(state.trackLength);
+
+		synchronized(cars) {
+			for (Car car : cars) {
+				if (car.getZ() > state.trackLength) {
+					car.setZ(state.trackLength);
+				}
+				segment = findSegment(car.getZ());
+				segment.addCar(car);
+
 			}
-			segment = findSegment(car.getZ());
-			segment.addCar(car);
 		}
 	}
 
 	public void update(float delta) {
+
+		checkGameOver();
 
 		if (ServerState.getInstance().isMultiplayer()) {
 			sendDataServer();
@@ -287,7 +321,7 @@ public class Road {
 			Car car = playerSegment.getCars().get(n);
 			float carW = car.getWidth() * SPRITE_SCALE * 7;
 			if (state.player.getSpeed() > car.getSpeed()) {
-				if (overlap(playerX, playerW, car.getOffset(), carW, 0.8F)) {
+				if (overlap(playerX, playerW, car.getOffset(), carW, 0.8F) && state.player.getSpeed() > GameParameters.MAX_SPEED / 6) {
 					state.player.setSpeed(car.getSpeed() * (car.getSpeed() / state.player.getSpeed()));
 					state.position = Math.round(increase(car.getZ(), -GameParameters.PLAYER_Z, state.trackLength));
 					break;
@@ -320,15 +354,24 @@ public class Road {
 				if (overlap(playerX, playerW, item.getOffset(), itemW, 0.8F)) {
 					item.setActive(false);
 					if (item.type == Item.Types.LIFE) {
+						ScreenManager.getInstance().assetManager.get("music/item.wav", Sound.class).play(1f);
 						state.score += 300;
 						state.lives++;
 					} else if (item.type == Item.Types.BOOST) {
+						ScreenManager.getInstance().assetManager.get("music/boost.wav", Sound.class).play(1f);
 						state.score += 200;
 						state.player.setSpeed(GameParameters.MAX_SPEED * 1.125f);
 					}
 					break;
 				}
 			}
+		}
+	}
+
+	private void checkGameOver() {
+		if (state.lives == 0) {
+			ScreenManager.getInstance().score = state.score;
+			ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
 		}
 	}
 

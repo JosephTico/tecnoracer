@@ -11,9 +11,9 @@ public class Item extends Car {
 		super(offset, z, 0);
 		this.type = type;
 		if (type == Types.BOOST) {
-			texture = ScreenManager.getInstance().assetManager.get("sprites/bush1.png", Texture.class);
+			texture = ScreenManager.getInstance().assetManager.get("sprites/boost.png", Texture.class);
 		} else if (type == Types.LIFE) {
-			texture = ScreenManager.getInstance().assetManager.get("sprites/bush2.png", Texture.class);
+			texture = ScreenManager.getInstance().assetManager.get("sprites/life.png", Texture.class);
 		}
 	}
 

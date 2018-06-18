@@ -75,6 +75,13 @@ public class Loading extends AbstractScreen {
 		AssetManager assMan = ScreenManager.getInstance().assetManager;
 		assMan.load("music/racer.mp3", Music.class);
 		assMan.load("music/explosion.mp3", Sound.class);
+		assMan.load("music/accel.wav", Sound.class);
+		assMan.load("music/boost.wav", Sound.class);
+		assMan.load("music/item.wav", Sound.class);
+		assMan.load("music/breaks.wav", Sound.class);
+		assMan.load("music/exit.wav", Sound.class);
+
+
 		assMan.load("sprites/billboard01.png", Texture.class);
 		assMan.load("sprites/billboard02.png", Texture.class);
 		assMan.load("sprites/billboard03.png", Texture.class);
@@ -116,8 +123,9 @@ public class Loading extends AbstractScreen {
 
 		assMan.load("sprites/bomb.png", Texture.class);
 		assMan.load("sprites/explosion.gif", Texture.class);
-		assMan.load("sprites/bush1.png", Texture.class);
-		assMan.load("sprites/bush2.png", Texture.class);
+		assMan.load("sprites/life.png", Texture.class);
+		assMan.load("sprites/boost.png", Texture.class);
+		assMan.load("sprites/stump.png", Texture.class);
 		assMan.load("sprites/light.png", Texture.class);
 
 

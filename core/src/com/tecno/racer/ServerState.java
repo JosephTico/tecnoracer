@@ -7,6 +7,7 @@ import org.json.*;
 import road.Car;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ServerState {
@@ -16,7 +17,7 @@ public class ServerState {
 	private String host;
 	private int port;
 	private boolean multiplayerReady = false;
-	private List<Car> cars = new ArrayList<Car>();
+	private final List<Car> cars = Collections.synchronizedList(new ArrayList<Car>());
 	private int id = 1;
 
 	private ServerState() {
@@ -84,7 +85,6 @@ public class ServerState {
 
 	public void proccessInput(String data) {
 		data = data.substring(0, data.length() - 1);
-		System.out.println(data);
 
 		try {
 			JSONObject json = new JSONObject(data);
@@ -103,15 +103,15 @@ public class ServerState {
 		cars.clear();
 		for (int i=0; i < players.length(); i++) {
 			JSONObject player = players.getJSONObject(i);
-			int pos = player.getInt("position") + GameParameters.SEGMENT_LENGTH * 4 + 48;
+			int pos = player.getInt("position") + GameParameters.OTHER_PLAYER_Z_FIX;
 			float x = player.getFloat("x");
 			int id = player.getInt("id");
+			int life = player.getInt("life");
 
-			if (id == ServerState.getInstance().getId() || id == 0)
+			if (id == ServerState.getInstance().getId() || id == 0 || life == 0)
 				continue;
 
 			Car tempCar = new Car(x,pos,0, id);
-			System.out.println("CAR " + id + " " +tempCar);
 
 			cars.add(tempCar);
 		}

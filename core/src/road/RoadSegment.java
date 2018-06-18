@@ -57,6 +57,10 @@ public class RoadSegment {
 		return new RoadSegment(index, p1, p2, curve, DARK_ROAD, DARK_GRASS, RED_RUMBLE, false);
 	}
 
+	public static RoadSegment createFinishRoadSegment(int index, Point p1, Point p2, float curve) {
+		return new RoadSegment(index, p1, p2, curve, WHITE_RUMBLE, DARK_GRASS, RED_RUMBLE, false);
+	}
+
 	public Point getP1() {
 		return p1;
 	}

@@ -19,6 +19,12 @@ public class Scenery {
 	protected float offset;
 	protected int z;
 
+	public Scenery(float offset, int z, String sprite) {
+		this.offset = offset;
+		this.z = z;
+		texture = ScreenManager.getInstance().assetManager.get("sprites/" + sprite, Texture.class);
+	}
+
 	public Scenery(float offset, int z) {
 		this.offset = offset;
 		this.z = z;
