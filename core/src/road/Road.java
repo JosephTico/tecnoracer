@@ -116,7 +116,7 @@ public class Road {
 		float offset;
 		int z;
 		float speed;
-		for (int n = 0; n < 150; n++) {
+		for (int n = 0; n < 200; n++) {
 			offset = (float) (Math.random() * MathUtils.random(-1F, 1F));
 			z = (int) (Math.floor(Math.random() * roadSegments.size()) * GameParameters.SEGMENT_LENGTH);
 			speed = 1000F + (float) (MathUtils.random(1000, 5000));//(float) (maxSpeed / 4 + Math.random() * maxSpeed / 2);//(sprite == SPRITES.SEMI ? 4 : 2);
@@ -133,7 +133,7 @@ public class Road {
 		RoadSegment segment;
 		float offset;
 		int z;
-		for (int n = 0; n < 50; n++) {
+		for (int n = 0; n < 70; n++) {
 			offset = (float) (Math.random() * MathUtils.random(-1F, 1F));
 			z = (int) (Math.floor(Math.random() * roadSegments.size()) * GameParameters.SEGMENT_LENGTH);
 			bomb = new Bomb(offset, z);
@@ -212,8 +212,12 @@ public class Road {
 				return dir * 1 / i * (car.getSpeed() - state.player.getSpeed()) / GameParameters.MAX_SPEED; // the closer the cars (smaller i) and the greated the speed ratio, the larger the offset
 			}
 
-			for (int j = 0; j < segment.getCars().size(); j++) {
-				otherCar = segment.getCars().get(j);
+			ArrayList<Car> obstacles = new ArrayList<Car>();
+			obstacles.addAll(segment.getCars());
+			obstacles.addAll(segment.getBombs());
+
+			for (int j = 0; j < obstacles.size(); j++) {
+				otherCar = obstacles.get(j);
 				otherCarW = otherCar.getWidth() * SPRITE_SCALE;
 				if ((car.getSpeed() > otherCar.getSpeed()) && overlap(car.getOffset(), carW, otherCar.getOffset(), otherCarW, 1.2F)) {
 					if (otherCar.getOffset() > 0.5)

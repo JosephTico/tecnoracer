@@ -95,6 +95,7 @@ public class GameStage extends AbstractScreen {
 		debugTable.setX(GameParameters.WIDTH - debugTable.getWidth() - 10);
 		debugTable.setY(GameParameters.HEIGHT - debugTable.getHeight() - rightTable.getHeight() - 30);
 		addActor(debugTable);
+		//debugTable.setVisible(false); // Modo debug apagado, quitar esto para encenderlo
 
 		debugLabel = new Label("Speed", skin);
 		debugTable.add(debugLabel).expandX().center();
@@ -133,7 +134,7 @@ public class GameStage extends AbstractScreen {
 				TimeUnit.MILLISECONDS.toSeconds(elapsedTime) -
 						TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsedTime))
 		);
-		leftLabel.setText("Speed: " + Math.round(state.player.getSpeed() / GameParameters.MAX_SPEED  * 180) + "kph\nScore: " + String.format("%08d", state.score) +"\nTime: " + time);
+		leftLabel.setText("Speed: " + Math.round(state.player.getSpeed() / GameParameters.MAX_SPEED  * 180) + "kph\nScore: " + String.format("%06d", state.score) +"\nTime: " + time);
 		rightLabel.setText("Lives: " + state.lives);
 		debugLabel.setText("X: " + state.player.getX() +  "\nPos: " + state.position +  "\nLength: " + state.trackLength + "\nSegment: " + Math.round(state.position / GameParameters.SEGMENT_LENGTH) + " of " + Math.round(state.trackLength / GameParameters.SEGMENT_LENGTH));
 
