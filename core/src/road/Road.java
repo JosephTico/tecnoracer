@@ -258,6 +258,7 @@ public class Road {
 		} catch (Exception e) {
 			ServerState.getInstance().setMultiplayer(false);
 			System.out.println("Desconectado");
+			ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
 		}
 	}
 
